@@ -21,6 +21,7 @@ def main():
     ap.add_argument("--after")
     ap.add_argument("--shape", default="VM.GPU.A10.1")
     ap.add_argument("--storage", type=int, default=100)
+    ap.add_argument("--env", nargs="*", default=[], help="variáveis extras K=V (ex.: DMB_SPLIT=dev DMB_LIMIT=50)")
     args = ap.parse_args()
     LOG.parent.mkdir(exist_ok=True)
     if args.after:
@@ -29,7 +30,8 @@ def main():
         while True:
             try:
                 run_id = jobs.run_job(f"{args.mode}-{cand}-gpu", "infra/ds/run_job.sh", args.shape, None, None,
-                                      False, {"DMB_CANDIDATE": cand, "DMB_MODE": args.mode, "DMB_DEVICE": "auto"},
+                                      False, {"DMB_CANDIDATE": cand, "DMB_MODE": args.mode, "DMB_DEVICE": "auto",
+                                       **dict(kv.split("=", 1) for kv in args.env)},
                                       storage_gb=args.storage, region=provision.GPU_REGION)
                 break
             except jobs.oci.exceptions.ServiceError as error:
