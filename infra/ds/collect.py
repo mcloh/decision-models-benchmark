@@ -67,14 +67,20 @@ def main():
     table = ("| Candidato | Disp. | Precisão | n | Acurácia | Macro F1 | ECE (bruto) | p50 ms | p95 ms | p99 ms | "
              "Carga s | RAM pico MiB | GPU pico MiB | Erros | Truncados |\n"
              "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|\n" + "\n".join(rows))
-    readme = (f"# Resultados — partição `{args.split}`"
-              + (f", {args.examples} exemplos" if args.examples else "") + "\n\n"
-              "Gerado por `infra/ds/collect.py` a partir dos buckets de resultados. CPU: us-chicago-1 "
-              "(`VM.Standard.E4.Flex`, 8 OCPU, sub-rede privada). GPU: sa-saopaulo-1 (`VM.GPU.A10.1`). "
-              "Lote 1; latências excluem os exemplos de aquecimento. Probabilidades ainda sem calibração.\n\n"
-              + table + "\n")
-    (dest / "README.md").write_text(readme)
-    print(readme)
+    start, end = "<!-- TABELA:INICIO -->", "<!-- TABELA:FIM -->"
+    block = f"{start}\n{table}\n{end}"
+    readme_path = dest / "README.md"
+    if readme_path.exists() and start in readme_path.read_text():
+        # README editado à mão: só a tabela entre os marcadores é regenerada.
+        text = readme_path.read_text()
+        readme = text[:text.index(start)] + block + text[text.index(end) + len(end):]
+    else:
+        readme = (f"# Resultados — partição `{args.split}`"
+                  + (f", {args.examples} exemplos" if args.examples else "") + "\n\n"
+                  "Gerado por `infra/ds/collect.py`. Lote 1; latências sem os exemplos de aquecimento; "
+                  "probabilidades sem calibração.\n\n" + block + "\n")
+    readme_path.write_text(readme)
+    print(table)
 
 
 if __name__ == "__main__":
