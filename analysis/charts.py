@@ -4,7 +4,11 @@ Paleta: slots 1 (azul, GPU) e 2 (laranja, CPU) da paleta categórica de referên
 (CVD ΔE 24,7; visão normal 33,6; contraste ≥ 3:1 sobre #fcfcfb). Uma série → sem legenda;
 duas séries → legenda + rótulos diretos. Um único eixo y por gráfico.
 
-Uso: python -m analysis.charts reports/pilot
+Uso: python -m analysis.charts reports/pilot [--kind pilot|calibration]
+
+Calibração: uma cor fixa por candidato (slots 1–4: SemIf, Rizzo Flow, Laya, GLiNER), validada
+(CVD ΔE ≥ 9,1; visão normal ≥ 22,9). Aqua e amarelo ficam abaixo de 3:1 de contraste: as curvas
+levam rótulo direto e o README traz a tabela.
 """
 import json
 import os
@@ -18,6 +22,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 
 SURFACE, INK, INK_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e6e5e1"
 GPU, CPU = "#2a78d6", "#eb6834"
+ENTITY = {"semif": "#2a78d6", "rizzo_flow": "#eb6834", "laya": "#1baf7a", "gliner": "#eda100"}
 NAMES = {"semif": "SemIf", "rizzo_flow": "Rizzo Flow", "laya": "Laya", "gliner": "GLiNER"}
 P95_LIMIT_MS = 150
 
@@ -115,12 +120,99 @@ def tradeoff_chart(data, dest):
     plt.close(fig)
 
 
+def calibration_charts(dest):
+    from analysis.calibrate import apply_temperature
+    from analysis.metrics import selective
+
+    cal = json.loads((Path(__file__).resolve().parents[1] / "config" / "calibration.json").read_text())["candidates"]
+    data = load(dest)
+    order = [c for c in ("semif", "rizzo_flow", "laya", "gliner") if (c, "cuda") in data]
+
+    # 1. Acurácia (GPU, partição de calibração)
+    rows = sorted(((c, data[(c, "cuda")]["quality"]["accuracy"] * 100) for c in order), key=lambda r: r[1])
+    fig, ax = plt.subplots(figsize=(7, 2.8))
+    bars = ax.barh([NAMES[c] for c, _ in rows], [v for _, v in rows], height=0.55, color=GPU)
+    for bar, (_, v) in zip(bars, rows):
+        ax.text(v + 1, bar.get_y() + bar.get_height() / 2, f"{v:.1f}%", va="center", color=INK)
+    ax.set_xlim(0, 105)
+    ax.set_xlabel("Acurácia (%)")
+    ax.set_title("Acurácia na partição de calibração (1.127 exemplos, GPU)", loc="left", fontsize=12, color=INK)
+    style(ax)
+    fig.tight_layout()
+    save(fig, dest / "chart-acuracia.svg")
+    plt.close(fig)
+
+    # 2. ECE antes × depois da calibração
+    fig, ax = plt.subplots(figsize=(7, 2.9))
+    for i, c in enumerate(sorted(order, key=lambda c: cal[c]["cuda"]["ece_raw"])):
+        raw, after = cal[c]["cuda"]["ece_raw"], cal[c]["cuda"]["ece_calibrated"]
+        ax.plot([after, raw], [i, i], color=GRID, linewidth=2, zorder=1)
+        ax.scatter(raw, i, s=70, facecolor=SURFACE, edgecolor=INK_2, linewidth=1.6, zorder=3,
+                   label="Bruto" if i == 0 else None)
+        ax.scatter(after, i, s=70, color=GPU, edgecolor=SURFACE, linewidth=2, zorder=3,
+                   label="Calibrado (temperatura)" if i == 0 else None)
+        ax.text(raw + 0.008, i, f"{raw:.3f}", va="center", color=INK, fontsize=10)
+        ax.text(after - 0.008, i, f"{after:.3f}", va="center", ha="right", color=INK, fontsize=10)
+        ax.set_yticks(list(range(i + 1)))
+    ax.set_yticklabels([NAMES[c] for c in sorted(order, key=lambda c: cal[c]["cuda"]["ece_raw"])])
+    ax.set_xlim(-0.03, 0.4)
+    ax.set_xlabel("ECE — erro de calibração esperado (menor é melhor)")
+    ax.set_title("Calibração das probabilidades: antes × depois", loc="left", fontsize=12, color=INK)
+    ax.legend(loc="lower right", frameon=False, fontsize=10)
+    style(ax)
+    fig.tight_layout()
+    save(fig, dest / "chart-ece.svg")
+    plt.close(fig)
+
+    # 3. Cobertura × risco (rota errada com confiança alta), probabilidades calibradas
+    fig, ax = plt.subplots(figsize=(7, 4.2))
+    ax.axvline(2, color=INK_2, linewidth=1, linestyle=(0, (4, 3)))
+    ax.axhline(80, color=INK_2, linewidth=1, linestyle=(0, (1, 3)))
+    ax.text(2.15, 33, "risco máx. 2%", color=INK_2, fontsize=9)
+    label_at = {"semif": (0.25, 90), "rizzo_flow": (4.2, 47), "gliner": (4.6, 12), "laya": (4.6, 4)}
+    ax.text(15.8, 81.5, "meta de cobertura 80%", color=INK_2, fontsize=9, ha="right")
+    for c in order:
+        preds = [json.loads(l) for l in (dest / f"predictions-{c}-cuda.jsonl").open()]
+        t = cal[c]["cuda"]["temperature"]
+        rows_c = []
+        for r in preds:
+            if r.get("probabilities"):
+                p = apply_temperature(r["probabilities"], t)
+                rows_c.append({**r, "probabilities": p, "pred": max(p, key=p.get)})
+        xs, ys = [], []
+        for thr in [i / 200 for i in range(0, 201)]:
+            sres = selective(rows_c, thr)
+            xs.append(sres["confident_wrong_rate"] * 100)
+            ys.append(sres["coverage"] * 100)
+        ax.plot(xs, ys, color=ENTITY[c], linewidth=2)
+        chosen = cal[c]["cuda"]
+        ax.scatter(chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100, s=60, color=ENTITY[c],
+                   edgecolor=SURFACE, linewidth=2, zorder=3)
+        ax.annotate(f"{NAMES[c]}: {chosen['coverage'] * 100:.0f}% de cobertura",
+                    (chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100),
+                    xytext=label_at[c], textcoords="data", color=INK, fontsize=10,
+                    arrowprops={"arrowstyle": "-", "color": INK_2, "linewidth": 0.8})
+    ax.set_xlim(0, 16)
+    ax.set_ylim(0, 102)
+    ax.set_xlabel("Rota errada com confiança alta (% do total)")
+    ax.set_ylabel("Cobertura (% decidido sem desambiguar)")
+    ax.set_title("Cobertura × risco ao variar o limiar de confiança (GPU)", loc="left", fontsize=12, color=INK)
+    style(ax, grid_axis="both")
+    fig.tight_layout()
+    save(fig, dest / "chart-cobertura-risco.svg")
+    plt.close(fig)
+
+
 def main():
     dest = Path(sys.argv[1])
-    data = load(dest)
-    accuracy_chart(data, dest)
-    latency_chart(data, dest)
-    tradeoff_chart(data, dest)
+    kind = sys.argv[sys.argv.index("--kind") + 1] if "--kind" in sys.argv else "pilot"
+    if kind == "calibration":
+        calibration_charts(dest)
+    else:
+        data = load(dest)
+        accuracy_chart(data, dest)
+        latency_chart(data, dest)
+        tradeoff_chart(data, dest)
     print(sorted(p.name for p in dest.glob("chart-*.svg")))
 
 
