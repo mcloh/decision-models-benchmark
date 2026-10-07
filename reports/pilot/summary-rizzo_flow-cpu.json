@@ -1,0 +1,56 @@
+{
+  "candidate": {
+    "name": "rizzo_flow",
+    "model_id": "rizzo_flow@55633c8cbd2b",
+    "revision": "55633c8cbd2b826bd3eefdeb05310450996649df",
+    "adapter_version": "0.1.0",
+    "device": "cpu",
+    "context_limit": 2048,
+    "probabilities_source": "native"
+  },
+  "precision": "gguf-q8_0",
+  "device": "cpu",
+  "split": "dev",
+  "examples": 50,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "load_seconds": 4.05,
+  "warmup_latency_ms": [
+    12644.8,
+    12270.7,
+    10005.1,
+    8619.5,
+    12360.3
+  ],
+  "latency_ms": {
+    "n": 45,
+    "p50": 12734.375058000069,
+    "p95": 18693.618147000027,
+    "p99": 19293.5656688,
+    "mean": 13519.72670173334
+  },
+  "errors": {},
+  "truncated": 0,
+  "state_tokens_max": 118,
+  "rss_peak_mib": 4936.19140625,
+  "quality": {
+    "n": 50,
+    "errors": 0,
+    "accuracy": 0.86,
+    "macro_f1": 0.875,
+    "macro_precision": 0.8586309523809523,
+    "macro_recall": 0.9136904761904762
+  },
+  "calibration_raw": {
+    "brier": 0.2316420465506699,
+    "nll": 0.4476962898724017,
+    "ece": 0.09500269948893228
+  },
+  "oci": {
+    "region": "us-chicago-1",
+    "run_id": "20261007T174254Z-rizzo_flow-evaluate"
+  }
+}
