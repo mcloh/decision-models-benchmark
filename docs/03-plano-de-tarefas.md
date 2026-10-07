@@ -20,7 +20,7 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 57 de 78 tarefas concluídas (73%), 3 em andamento.
+**Andamento em 2026-10-07:** 58 de 78 tarefas concluídas (74%), 2 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
@@ -31,11 +31,11 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F4 — Contrato JEV e adaptadores | 16 | 0 | 0 |
 | F5 — Controle de execução | 3 | 0 | 0 |
 | F6 — Piloto | 4 | 0 | 0 |
-| F7 — Desenvolvimento e calibração | 3 | 1 | 0 |
+| F7 — Desenvolvimento e calibração | 4 | 0 | 0 |
 | F8 — Teste final | 0 | 0 | 4 |
 | F9 — Métricas e análise | 0 | 0 | 8 |
 | F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **57** | **3** | **18** |
+| **Total** | **58** | **2** | **18** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -183,7 +183,8 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 
 ## F7 — Desenvolvimento e calibração
 
-- [~] **59.** Executar os candidatos no conjunto de desenvolvimento, sem calibração adicional.
+- [x] **59.** Executar os candidatos no conjunto de desenvolvimento, sem calibração adicional.
+  - ↳ 1.183 exemplos, sem erros: SemIf 88,4%, Rizzo Flow 85,5%, GLiNER 55,5%, Laya 54,0% (GPU). Resultados em [`reports/dev/`](../reports/dev/README.md).
 - [x] **60.** Escolher os limites de confiança e as regras de abstenção só com a partição de calibração.
   - ↳ Abster-se significa encaminhar para desambiguação. A regra é escolhida por meta de cobertura ou de risco, definida antes. *(Q5)*
   - ↳ `analysis/calibrate.py` → `config/calibration.json`: menor limiar com rota errada com confiança alta ≤ 2%. Cobertura na calibração: SemIf 59,5%, Rizzo Flow 47,6%, GLiNER 11,8%, Laya 5,1% (nenhum atinge os 80% do critério H2).

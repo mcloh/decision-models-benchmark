@@ -1,0 +1,60 @@
+{
+  "candidate": {
+    "name": "semif",
+    "model_id": "semif@851bf6e806ef",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "adapter_version": "0.2.0",
+    "device": "cuda",
+    "context_limit": 8192,
+    "probabilities_source": "native"
+  },
+  "precision": "bfloat16",
+  "device": "cuda",
+  "split": "dev",
+  "examples": 1183,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "load_seconds": 7.8,
+  "warmup_latency_ms": [
+    475.5,
+    178.9,
+    76.9,
+    141.7,
+    184.3
+  ],
+  "latency_ms": {
+    "n": 1178,
+    "p50": 117.1211939999921,
+    "p95": 186.51699405000102,
+    "p99": 190.08992016000263,
+    "mean": 125.81136090662143
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 92,
+  "rss_peak_mib": 9027.6640625,
+  "gpu_mem_peak_mib": 8513.0,
+  "gpu_util_mean_pct": 87.24183006535948,
+  "quality": {
+    "n": 1183,
+    "errors": 0,
+    "accuracy": 0.8841927303465765,
+    "macro_f1": 0.900963005076605,
+    "macro_precision": 0.9043141854943706,
+    "macro_recall": 0.9103958961439549
+  },
+  "calibration_raw": {
+    "brier": 0.18796590703757624,
+    "nll": 0.4037357594473513,
+    "ece": 0.04242615879670591
+  },
+  "oci": {
+    "region": "sa-saopaulo-1",
+    "run_id": "20261007T212022Z-semif-evaluate"
+  }
+}

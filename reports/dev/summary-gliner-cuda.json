@@ -1,0 +1,61 @@
+{
+  "candidate": {
+    "name": "gliner",
+    "model_id": "gliner@a35a0cd3b7a0",
+    "revision": "a35a0cd3b7a0f00f2effc576f454cd48fa98aa5f",
+    "adapter_version": "0.2.0",
+    "device": "cuda",
+    "context_limit": 4096,
+    "probabilities_source": "native"
+  },
+  "precision": "float32",
+  "device": "cuda",
+  "split": "dev",
+  "examples": 1183,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "repetition": 1,
+  "load_seconds": 21.83,
+  "warmup_latency_ms": [
+    230.5,
+    122.3,
+    102.2,
+    268.8,
+    32.8
+  ],
+  "latency_ms": {
+    "n": 1178,
+    "p50": 18.382403499998645,
+    "p95": 31.400230849988017,
+    "p99": 33.525557409979854,
+    "mean": 21.355778809847063
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 111,
+  "rss_peak_mib": 3227.6171875,
+  "gpu_mem_peak_mib": 1959.0,
+  "gpu_util_mean_pct": 42.634408602150536,
+  "quality": {
+    "n": 1183,
+    "errors": 0,
+    "accuracy": 0.5545224006762468,
+    "macro_f1": 0.5525597734274297,
+    "macro_precision": 0.7029289830574256,
+    "macro_recall": 0.542247078905617
+  },
+  "calibration_raw": {
+    "brier": 0.6045309118425269,
+    "nll": 1.3080394222612395,
+    "ece": 0.08826073768581884
+  },
+  "oci": {
+    "region": "sa-saopaulo-1",
+    "run_id": "20261007T225945Z-gliner-evaluate"
+  }
+}

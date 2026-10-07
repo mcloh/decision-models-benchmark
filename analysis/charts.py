@@ -55,6 +55,9 @@ def style(ax, grid_axis="x"):
     ax.set_axisbelow(True)
 
 
+LABEL = "piloto, 50 exemplos de dev"
+
+
 def accuracy_chart(data, dest):
     rows = sorted(((NAMES[c], s["quality"]["accuracy"] * 100) for (c, d), s in data.items() if d == "cuda"),
                   key=lambda r: r[1])
@@ -64,7 +67,7 @@ def accuracy_chart(data, dest):
         ax.text(v + 1, bar.get_y() + bar.get_height() / 2, f"{v:.0f}%", va="center", color=INK, fontsize=11)
     ax.set_xlim(0, 105)
     ax.set_xlabel("Acurácia (%)")
-    ax.set_title("Acurácia por candidato — piloto, 50 exemplos de dev", loc="left", fontsize=12, color=INK)
+    ax.set_title(f"Acurácia por candidato — {LABEL}", loc="left", fontsize=12, color=INK)
     style(ax)
     fig.tight_layout()
     save(fig, dest / "chart-acuracia.svg")
@@ -87,7 +90,8 @@ def latency_chart(data, dest):
                    label="GPU (A10)" if i == 0 else None)
         ax.text(g / 1.18, i, f"{g:.0f} ms", va="center", ha="right", color=INK, fontsize=10)
     ax.set_xscale("log")
-    ax.set_xlim(5, 200_000)
+    top = max(s["latency_ms"]["p50"] for s in data.values())
+    ax.set_xlim(5, top * 8)
     ax.set_yticks(range(len(cands)), [NAMES[c] for c in cands])
     ax.set_ylim(-0.6, len(cands) - 0.4)
     ax.set_xlabel("Latência mediana por decisão (ms, escala log)")
@@ -113,10 +117,45 @@ def tradeoff_chart(data, dest):
     ax.set_ylim(30, 104)
     ax.set_xlabel("Latência p95 por decisão em GPU A10 (ms)")
     ax.set_ylabel("Acurácia (%)")
-    ax.set_title("Qualidade × latência em GPU — piloto", loc="left", fontsize=12, color=INK)
+    ax.set_title(f"Qualidade × latência em GPU — {LABEL}", loc="left", fontsize=12, color=INK)
     style(ax, grid_axis="both")
     fig.tight_layout()
     save(fig, dest / "chart-qualidade-latencia.svg")
+    plt.close(fig)
+
+
+def options_chart(dest):
+    """Acurácia por número de opções (GPU), uma linha por candidato com cor fixa e rótulo direto."""
+    from collections import defaultdict
+    order = [c for c in ("semif", "rizzo_flow", "laya", "gliner") if (dest / f"predictions-{c}-cuda.jsonl").exists()]
+    if len(order) < 2:
+        return
+    fig, ax = plt.subplots(figsize=(7, 3.8))
+    ends = []
+    for c in order:
+        byk = defaultdict(list)
+        for l in (dest / f"predictions-{c}-cuda.jsonl").open():
+            r = json.loads(l)
+            byk[r["n_options"]].append(r["pred"] == r["gold"])
+        ks = sorted(byk)
+        ys = [sum(byk[k]) / len(byk[k]) * 100 for k in ks]
+        ax.plot(ks, ys, color=ENTITY[c], linewidth=2, marker="o", markersize=7,
+                markeredgecolor=SURFACE, markeredgewidth=2)
+        ends.append([ys[-1], c])
+    ends.sort()
+    for i in range(1, len(ends)):  # afasta rótulos finais muito próximos
+        ends[i][0] = max(ends[i][0], ends[i - 1][0] + 4.5)
+    for y, c in ends:
+        ax.text(16.5, y, NAMES[c], va="center", color=INK, fontsize=10)
+    ax.set_xticks([4, 8, 12, 16])
+    ax.set_xlim(3, 19.5)
+    ax.set_ylim(30, 100)
+    ax.set_xlabel("Opções por pergunta (incluindo sem_correspondencia)")
+    ax.set_ylabel("Acurácia (%)")
+    ax.set_title(f"Acurácia por número de opções (GPU) — {LABEL}", loc="left", fontsize=12, color=INK)
+    style(ax, grid_axis="y")
+    fig.tight_layout()
+    save(fig, dest / "chart-acuracia-por-opcoes.svg")
     plt.close(fig)
 
 
@@ -205,7 +244,10 @@ def calibration_charts(dest):
 
 def main():
     dest = Path(sys.argv[1])
+    global LABEL
     kind = sys.argv[sys.argv.index("--kind") + 1] if "--kind" in sys.argv else "pilot"
+    if "--label" in sys.argv:
+        LABEL = sys.argv[sys.argv.index("--label") + 1]
     if kind == "calibration":
         calibration_charts(dest)
     else:
@@ -213,6 +255,7 @@ def main():
         accuracy_chart(data, dest)
         latency_chart(data, dest)
         tradeoff_chart(data, dest)
+        options_chart(dest)
     print(sorted(p.name for p in dest.glob("chart-*.svg")))
 
 

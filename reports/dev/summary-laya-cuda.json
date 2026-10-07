@@ -1,0 +1,61 @@
+{
+  "candidate": {
+    "name": "laya",
+    "model_id": "laya@1720e3e3357c",
+    "revision": "1720e3e3357cfe1e281542e223f8273b0890ca34",
+    "adapter_version": "0.2.0",
+    "device": "cuda",
+    "context_limit": 1024,
+    "probabilities_source": "native"
+  },
+  "precision": "float32",
+  "device": "cuda",
+  "split": "dev",
+  "examples": 1183,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "repetition": 1,
+  "load_seconds": 8.63,
+  "warmup_latency_ms": [
+    267.0,
+    23.9,
+    28.8,
+    22.5,
+    22.0
+  ],
+  "latency_ms": {
+    "n": 1178,
+    "p50": 21.277854500013405,
+    "p95": 22.840718200023957,
+    "p99": 23.972385839989272,
+    "mean": 21.330872347199037
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 88,
+  "rss_peak_mib": 2788.2734375,
+  "gpu_mem_peak_mib": 1811.0,
+  "gpu_util_mean_pct": 23.876923076923077,
+  "quality": {
+    "n": 1183,
+    "errors": 0,
+    "accuracy": 0.5401521555367709,
+    "macro_f1": 0.5640542708097033,
+    "macro_precision": 0.5674752834546252,
+    "macro_recall": 0.6107508359339806
+  },
+  "calibration_raw": {
+    "brier": 0.7225865298942042,
+    "nll": 2.388330438407087,
+    "ece": 0.289904728672071
+  },
+  "oci": {
+    "region": "sa-saopaulo-1",
+    "run_id": "20261007T225348Z-laya-evaluate"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "candidate": {
+    "name": "laya",
+    "model_id": "laya@1720e3e3357c",
+    "revision": "1720e3e3357cfe1e281542e223f8273b0890ca34",
+    "adapter_version": "0.2.0",
+    "device": "cpu",
+    "context_limit": 1024,
+    "probabilities_source": "native"
+  },
+  "precision": "float32",
+  "device": "cpu",
+  "split": "dev",
+  "examples": 1183,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "load_seconds": 9.62,
+  "warmup_latency_ms": [
+    204.6,
+    207.7,
+    121.5,
+    196.9,
+    212.3
+  ],
+  "latency_ms": {
+    "n": 1178,
+    "p50": 182.26328300002592,
+    "p95": 225.58538830001848,
+    "p99": 269.49032219999947,
+    "mean": 172.6108822342957
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 88,
+  "rss_peak_mib": 2679.45703125,
+  "quality": {
+    "n": 1183,
+    "errors": 0,
+    "accuracy": 0.5435333896872359,
+    "macro_f1": 0.5680334298339897,
+    "macro_precision": 0.5694536348851899,
+    "macro_recall": 0.6150514981972314
+  },
+  "calibration_raw": {
+    "brier": 0.7229926606136773,
+    "nll": 2.383286506378013,
+    "ece": 0.2874671577754089
+  },
+  "oci": {
+    "region": "us-chicago-1",
+    "run_id": "20261007T211944Z-laya-evaluate"
+  }
+}
