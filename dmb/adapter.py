@@ -13,7 +13,9 @@ class Adapter(ABC):
     """
 
     name: str
-    adapter_version = "0.1.0"
+    adapter_version = "0.2.0"
+    # Diagnósticos da última decisão (ex.: opções truncadas pelo modelo); vão para metadata.diagnostics.
+    last_diagnostics: dict = {}
     probabilities_source = "native"
 
     def __init__(self, model_dir: str | Path, revision: str, device: str = "auto",

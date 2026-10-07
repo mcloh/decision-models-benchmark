@@ -41,6 +41,8 @@ def build_response(adapter: Adapter, request: dict, answers: dict, input_tokens:
             "probabilities_source": adapter.probabilities_source,
         },
     }
+    if adapter.last_diagnostics:
+        response["metadata"]["diagnostics"] = adapter.last_diagnostics
     errors = response_errors(response)
     if errors:
         raise UnknownOption("resposta fora do contrato: " + "; ".join(errors[:3]))
@@ -54,6 +56,7 @@ def systemone(adapter: Adapter, request: dict) -> dict:
     if not isinstance(state, str):
         # Todo adaptador recebe texto; estados estruturados viram JSON canônico.
         state = json.dumps(state, ensure_ascii=False, sort_keys=True)
+    adapter.last_diagnostics = {}
     started = time.perf_counter()
     answers, input_tokens = adapter.decide(state, request["questions"])
     latency_ms = (time.perf_counter() - started) * 1000

@@ -26,6 +26,13 @@ class LayaAdapter(Adapter):
         self.agent = laya.load(str(self._workdir))
         self.tokenizer = Tokenizer.from_file(str(self.model_dir / "tokenizer" / "tokenizer.json"))
 
+    @property
+    def head_max_len(self) -> int | None:
+        """Orçamento de tokens da pergunta + opções (padrão do checkpoint: 192). Parâmetro operacional."""
+        import os
+        value = os.environ.get("DMB_LAYA_HEAD_MAX_LEN")
+        return int(value) if value else None
+
     def native_context_limit(self) -> int:
         return 1024  # padrão do checkpoint; 256 desses tokens vão para pergunta + opções
 
@@ -33,10 +40,14 @@ class LayaAdapter(Adapter):
         return len(self.tokenizer.encode(text, add_special_tokens=False).ids)
 
     def decide(self, state: str, questions: dict) -> tuple[dict, int]:
-        result = self.agent.predict(state, questions, max_len=self.context_limit)
+        result = self.agent.predict(state, questions, max_len=self.context_limit,
+                                    head_max_len=self.head_max_len)
         usage = result.get("usage", {})
         if usage.get("truncated") or usage.get("state_tokens_dropped"):
             raise ContextLimit(f"Laya truncou o estado: {usage}")
+        if usage.get("options"):
+            # Opções que perderam a descrição própria por falta de orçamento de cabeçalho.
+            self.last_diagnostics = {"collapsed_options": usage["options"], "head_max_len": self.head_max_len}
         answers = {}
         for name, question in questions.items():
             raw = result["answers"][name]

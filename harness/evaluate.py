@@ -140,6 +140,8 @@ def main():
             try:
                 resp = systemone(adapter, request)
                 ans = resp["answers"][ex["task"]]
+                if resp["metadata"].get("diagnostics"):
+                    row["diagnostics"] = resp["metadata"]["diagnostics"]
                 row.update(pred=ans["choice"], probabilities=ans["probabilities"],
                            confidence=ans.get("confidence"), input_tokens=resp["usage"]["input_tokens"],
                            latency_ms=resp["metadata"]["latency_ms"])
@@ -162,6 +164,8 @@ def main():
         "latency_ms": latency_summary([r["latency_ms"] for r in measured if r.get("pred") is not None]),
         "errors": {k: sum(r.get("error") == k for r in rows) for k in {r.get("error") for r in rows} if k},
         "truncated": sum(r["truncated"] for r in rows),
+        "with_diagnostics": sum("diagnostics" in r for r in rows),
+        "operational_env": {k: v for k, v in os.environ.items() if k.startswith("DMB_LAYA_")},
         "state_tokens_max": max((r["state_tokens"] or 0) for r in rows),
         "rss_peak_mib": rss_peak_mib(), **gpu.summary(),
         "quality": {k: v for k, v in classification(rows).items() if k != "per_label"},

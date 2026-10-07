@@ -4,12 +4,42 @@ __pycache__/
 .venv*
 .pytest_cache/
 
-# Pesos e caches de modelos (ficam no bucket `artefatos`)
-models/
-.cache/
+# Modelos: versiona só metadados úteis (README/model cards, config*.json, tokenizer_config.json,
+# LICENSE, índices e históricos de treino). Pesos, binários, tokenizadores grandes, runtimes e caches
+# ficam no bucket `dmb-artefatos`, com SHA-256 em env/artifacts-manifest.json.
+models/**/.cache/
+models/**/.gitattributes
+models/src/
+models/runtimes/
+models/**/downloads/
+models/**/tokenizer.json
+models/**/vocab.json
+models/**/merges.txt
+models/**/*.model
+models/**/*.tiktoken
+
+# Pesos, tensores e binários (em qualquer lugar)
 *.safetensors
-*.bin
 *.gguf
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.msgpack
+*.h5
+*.npy
+*.npz
+*.so
+*.so.*
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+*.bundle
+*.png
+*.jpg
+*.gif
 
 # Dados brutos e anotados não são versionados (ficam nos buckets OCI)
 data/raw/*
@@ -24,4 +54,5 @@ runs/
 .secrets/
 .oci/
 *.pem
+*.key
 .env
