@@ -1,16 +1,16 @@
 # 02 — Desenho experimental
 
-> **Escopo do primeiro ciclo (revisão de 2026-10-07).** Não há agentes implementados. Por isso o ciclo avalia só a **classificação de intenções (D1)** no domínio de **atendimento de telefonia móvel**, com a taxonomia `data/taxonomy/intents-v1.yaml` (42 intenções em 13 domínios). Pedidos fora de escopo, enunciados emocionais e casos com várias intenções entram como exemplos de D1, com rótulo `sem_correspondencia` ou a intenção principal. D2 a D5 ficam descritas abaixo para os próximos ciclos. Os dados são **100% sintéticos** e a anotação é feita por **três modelos generativos** (ver §4).
+> **Escopo do primeiro ciclo.** O ciclo avalia a **classificação de intenções (D1)** no domínio de **atendimento de telefonia móvel**, com a taxonomia `data/taxonomy/intents-v1.yaml` (42 intenções em 13 domínios). Pedidos fora de escopo, enunciados emocionais e casos com várias intenções entram como exemplos de D1, com rótulo `sem_correspondencia` ou a intenção principal. D2 a D5 ficam descritas abaixo para os próximos ciclos, quando houver agentes implementados. Os dados são **100% sintéticos** e a anotação é feita por **três modelos generativos** (ver §4).
 
 ## 1. Hipóteses
 
-- **H1 (acurácia).** Pelo menos um candidato atinge, em PT-BR, uma acurácia de roteamento (D1/D2) compatível com o uso no orquestrador. O critério é a não inferioridade em relação ao baseline LLM (margem de 3 p.p.); ver [04, Q5](04-questoes-em-aberto.md#q5--critérios-de-sucesso-pré-registrados).
+- **H1 (acurácia).** Pelo menos um candidato atinge, em PT-BR, uma acurácia de roteamento (D1/D2) compatível com o uso no orquestrador. O critério é a não inferioridade em relação ao baseline LLM (margem de 3 p.p.); ver [04, Q5](04-decisoes-de-projeto.md#q5--critérios-de-sucesso-pré-registrados).
 - **H2 (calibração).** As probabilidades e a confiança devolvidas permitem uma política de abstenção (encaminhar para desambiguação) que melhora a acurácia seletiva sem derrubar demais a cobertura.
 - **H3 (desempenho).** O candidato cabe no orçamento de latência por turno (p95 com lote 1) com um custo por mil decisões menor que o de uma chamada a um LLM generalista.
 
 ## 2. Tarefas de decisão
 
-Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão** (tarefa 21). No primeiro ciclo, cada questão tem **no máximo 16 opções**, incluindo `sem_correspondencia` (tarefas 22–23; limite do SemIf, ver Q2).
+Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão** (tarefa 21). No primeiro ciclo, cada questão tem **no máximo 16 opções**, incluindo `sem_correspondencia` (tarefas 22–23; ver Q2).
 
 ### D1 — Classificação de intenção
 
@@ -81,11 +81,11 @@ Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão
 
 **Conversão para JEV.** `question` vira `questions.<task>.instructions` e `options` vira `criteria` (contrato `jev-compat-v1`, em [contracts/jev/schemas/](../contracts/jev/schemas/)). O `state` enviado é sempre o **texto serializado** descrito abaixo, nunca o objeto estruturado.
 
-**Serialização do estado.** Alguns candidatos aceitam só texto, e não `state` estruturado. Por isso, uma **única regra de serialização** de `state` + `utterance` em texto vale para todos os adaptadores (um bloco "Contexto:" com o agente ativo, as sessões suspensas e os N últimos turnos, seguido de "Mensagem:"; N calculado como em [04, Q8](04-questoes-em-aberto.md#q8--turnos-no-state-e-orçamento-de-tokens)). A regra é versionada junto com a política de truncamento (tarefa 53). Um adaptador não pode usar informação de `state` que não esteja nessa serialização.
+**Serialização do estado.** Alguns candidatos aceitam só texto, e não `state` estruturado. Por isso, uma **única regra de serialização** de `state` + `utterance` em texto vale para todos os adaptadores (um bloco "Contexto:" com o agente ativo, as sessões suspensas e os N últimos turnos, seguido de "Mensagem:"; N calculado como em [04, Q8](04-decisoes-de-projeto.md#q8--turnos-no-state-e-orçamento-de-tokens)). A regra é versionada junto com a política de truncamento (tarefa 53). Um adaptador não pode usar informação de `state` que não esteja nessa serialização.
 
 ## 4. Dados
 
-**Primeiro ciclo: pipeline sintético (`datagen/`), executado na VM.**
+**Primeiro ciclo: pipeline sintético (`datagen/`).**
 
 | Etapa | Implementação | Tarefas |
 |-------|---------------|---------|
@@ -94,7 +94,7 @@ Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão
 | Anotação | `datagen.annotate`: três modelos (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`) em rodízio por lote; dois anotam de forma independente, sem ver o rótulo de geração, e o terceiro desempata. Três rótulos distintos → exemplo excluído. Instruções: [06-guia-de-anotacao.md](06-guia-de-anotacao.md) | 29–32 |
 | Montagem | `datagen.build`: partição por lote de geração (3/2/2 lotes por intenção para teste/calibração/dev), conjuntos de 4, 8, 12 ou 16 opções simulando a elegibilidade (10% sem a intenção correta → `sem_correspondencia`), lint e congelamento com SHA-256 em `dmb-entrada` e `dmb-logs-imutaveis` | 33–36 |
 
-**Conjunto d1-v1 (congelado em 2026-10-07):** 4.068 gerados → 4.057 após a preparação → 4054 após a anotação (62 por desempate; 3 excluídos). Partições: dev 1183, calibração 1127, teste 1744, com 43 rótulos em todas. Kappa entre anotadores de 0.98 a 0.99: a concordância muito alta sugere que parte dos casos sintéticos é fácil. Para o relatório, os cortes por perfil (erros, regionalismo, emocional, indireto) e por `gold_eligible=false` devem receber atenção.
+**Conjunto d1-v1:** 4.068 gerados → 4.057 após a preparação → 4054 após a anotação (62 por desempate; 3 excluídos). Partições: dev 1183, calibração 1127, teste 1744, com 43 rótulos em todas. Kappa entre anotadores de 0.98 a 0.99: a concordância muito alta sugere que parte dos casos sintéticos é fácil. Para o relatório, os cortes por perfil (erros, regionalismo, emocional, indireto) e por `gold_eligible=false` devem receber atenção.
 
 Itens abaixo descrevem o desenho geral (válido também para dados reais em ciclos futuros).
 

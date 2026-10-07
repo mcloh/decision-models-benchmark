@@ -1,6 +1,6 @@
 # 03 — Plano de tarefas
 
-As 78 microtarefas mantêm a numeração original. As linhas **↳** registram a adaptação de cada tarefa ao contexto de roteamento e orquestração ou uma dependência importante. As referências *Qn* apontam para as decisões de projeto em [04-questoes-em-aberto.md](04-questoes-em-aberto.md).
+As 78 microtarefas mantêm a numeração original. As linhas **↳** registram a adaptação de cada tarefa ao contexto de roteamento e orquestração ou uma dependência importante. As referências *Qn* apontam para as decisões de projeto em [04-decisoes-de-projeto.md](04-decisoes-de-projeto.md); o cenário de execução está em [05-cenario-de-execucao.md](05-cenario-de-execucao.md).
 
 ```mermaid
 flowchart LR
@@ -45,40 +45,38 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 ## F0 — Infraestrutura OCI
 
 - [x] **1.** Criar um compartment OCI dedicado ao benchmark.
-  - ↳ `<compartimento-pai>/decision-models` (caminho em `.secrets/oci-settings.json`). Recursos em `us-chicago-1`. OCIDs em `.secrets/artefatos-OCI.md` (fora do Git).
+  - ↳ `<compartimento-pai>/decision-models`. Catálogo de recursos fora do Git, em `.secrets/`.
 - [~] **2.** Aplicar as tags `projeto=benchmark-decisoes-ptbr`, `ambiente=benchmark` e `centro_custo=<definir>` aos recursos do projeto. *(Q13)*
-  - ↳ Parcial: `projeto` e `ambiente` aplicadas como tags livres por `infra/oci/provision.py`. Falta `centro_custo`.
+  - ↳ `projeto` e `ambiente` aplicadas como tags livres por `infra/oci/provision.py`. `centro_custo` não se aplica neste ciclo (Q13).
 - [ ] **3.** Criar um orçamento para o compartment.
-  - ↳ **Em aberto por decisão (2026-10-07):** o uso está coberto por cota interna de engenharia. Não será criado no primeiro ciclo.
+  - ↳ Não se aplica neste ciclo: o uso está coberto por cota interna de engenharia (Q13).
 - [ ] **4.** Configurar alertas de orçamento em 50%, 80% e 100% do valor aprovado.
-  - ↳ Em aberto, porque depende da tarefa 3.
+  - ↳ Não se aplica neste ciclo (depende da tarefa 3).
 - [x] **5.** Criar um projeto no OCI Data Science.
   - ↳ `benchmark-decisoes-ptbr`.
 - [~] **6.** Criar buckets no Object Storage para `entrada`, `artefatos`, `resultados` e `logs-imutaveis`.
-  - ↳ Criados com o prefixo `dmb-` (nomes de bucket são únicos no namespace), privados e com versionamento.
-  - ↳ Pendente: a regra de retenção (WORM) de `dmb-logs-imutaveis`, que depende do prazo de retenção (tarefa 77).
+  - ↳ Buckets `dmb-*`, privados e com versionamento. A regra de retenção de `dmb-logs-imutaveis` é definida com a política de arquivamento (tarefa 77).
 - [x] **7.** Definir políticas IAM de menor privilégio para leitura dos dados, escrita dos resultados e execução dos jobs.
-  - ↳ Sem acesso de administrador à tenancy, as políticas ficam no próprio compartment e não usam grupos nem dynamic groups.
+  - ↳ Políticas no escopo do compartment, sem grupos nem dynamic groups, com principais identificados por condição.
   - ↳ `dmb-usuario-manager`: o usuário (filtrado por `request.user.id`) é *manager* das famílias data-science, object, virtual-network, logging, repos e generative-ai.
   - ↳ `dmb-jobs-menor-privilegio`: os jobs (`request.principal.type='datasciencejob'`) leem `dmb-entrada`/`dmb-artefatos`, escrevem em `dmb-resultados`/`dmb-logs-imutaveis`, usam logs e repos. Inclui a política de serviço do Data Science para a VCN.
 - [x] **8.** Definir uma VCN privada para os jobs, com acesso ao Object Storage por Service Gateway.
   - ↳ `dmb-vcn` 10.20.0.0/16, sub-rede privada `dmb-subnet-jobs`. A rota e a security list só permitem tráfego para serviços OCI pelo Service Gateway.
 - [x] **9.** Criar uma rota temporária de saída por NAT Gateway, só para a aquisição inicial de dependências e pesos.
-  - ↳ Remover a rota logo após a tarefa 16 e passar pelo gate de egresso antes de qualquer execução. *(Q3)*
-  - ↳ **Não foi necessário:** a aquisição (tarefas 13–16) rodou fora da VCN e enviou os artefatos direto ao bucket; os ambientes são montados por jobs de build com rede gerenciada. `infra/oci/nat.py` fica disponível.
-  - ↳ Criar e ativar **só quando necessário**, com `infra/oci/nat.py on`. Para desligar: `nat.py off`, que fecha a rota e bloqueia o NAT. Na tarefa 78: `nat.py off --delete`.
+  - ↳ A aquisição (tarefas 13–16) é feita fora da rede dos jobs, e os ambientes são montados por jobs de build. A VCN dos jobs não tem saída para a internet. *(Q3)*
+  - ↳ `infra/oci/nat.py on|off|off --delete` abre e fecha uma saída temporária, se alguma aquisição futura precisar ser feita de dentro da VCN.
 - [x] **10.** Validar que os jobs acessam os buckets sem internet pública.
-  - ↳ Validado em 2026-10-07 com jobs do Data Science em `dmb-subnet-jobs`. Os pesos do Rizzo (4,4 GB) desceram pela Service Gateway em 28 s, com SHA-256 conferido.
+  - ↳ Jobs do Data Science em `dmb-subnet-jobs` baixam os artefatos pela Service Gateway, com SHA-256 conferido (4,4 GB em cerca de 30 s).
 
 ## F1 — Ambiente e artefatos
 
 - [x] **11.** Criar uma imagem de contêiner base com Python, CUDA, PyTorch, Transformers, Hugging Face Hub e ferramentas de medição.
   - ↳ Incluir um exportador OpenTelemetry, para que a telemetria do harness tenha o mesmo formato da observabilidade do orquestrador.
-  - ↳ **Substituído na prática por ambientes Python publicados no bucket** (`infra/ds/build_env.sh` → `dmb-artefatos/envs/<candidato>/`), porque os jobs do Data Science dispensam contêiner próprio. O CUDA vem das wheels `cu128` do PyTorch e o Python é o 3.11.9 base dos jobs.
-  - ↳ `env/Dockerfile` com `--build-arg CANDIDATE=...`: **uma imagem por candidato**, porque o SemIf exige `transformers==5.17.0` e o GLiNER exige `transformers<5`. Os pesos ficam fora da imagem. Falta fazer o build e o push para o OCIR, na VM.
+  - ↳ Implementado como **ambientes Python por candidato** publicados no bucket (`infra/ds/build_env.sh` → `dmb-artefatos/envs/<candidato>/`), executados nos jobs do Data Science. CUDA pelas wheels `cu128` do PyTorch; runtime llama.cpp para o Rizzo.
+  - ↳ Um ambiente por candidato, porque o SemIf exige `transformers==5.17.0` e o GLiNER `transformers<5`. `env/Dockerfile` oferece o equivalente em contêiner (uma imagem por candidato).
 - [x] **12.** Fixar num manifesto as versões do sistema, dos drivers CUDA, do Python, das bibliotecas e da imagem de contêiner.
 - [x] **13.** Baixar os pesos, tokenizadores, revisões e licenças aprovados de cada candidato. *(Q4)*
-  - ↳ `env/acquire.py`: todas as licenças são Apache-2.0 ou MIT (incluindo o Qwen3.5-4B). Rizzo: GGUF Q8_0 (padrão do projeto) + llama.cpp b11081. **Não foi preciso NAT**: a aquisição rodou fora da VCN e enviou direto ao bucket.
+  - ↳ `env/acquire.py`: todas as licenças são Apache-2.0 ou MIT (incluindo o Qwen3.5-4B). Rizzo: GGUF Q8_0 (padrão do projeto) + llama.cpp b11081.
   - ↳ A aquisição falha se a licença estiver fora da allowlist de `config/benchmark.yaml`. O contexto efetivo de cada candidato é medido e registrado.
   - ↳ Incluir as dependências específicas de cada candidato (pacote GLiNER, runtime SemIf, interface Rizzo Flow) e a revisão fixada de `Qwen/Qwen3.5-4B`.
 - [x] **14.** Calcular o SHA-256 de cada artefato baixado.
@@ -88,10 +86,9 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
   - ↳ O gate de egresso foi aprovado nas execuções em sub-rede privada: huggingface.co, pypi.org e github.com ficaram inacessíveis.
 - [x] **18.** Carregar cada candidato só a partir dos artefatos locais.
   - ↳ Usar `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1` e um cache apontado para os artefatos verificados.
-  - ↳ `harness/job.py` baixa do bucket só o que está no manifesto e confere o SHA-256. Os quatro candidatos já carregaram offline, a partir dos artefatos locais.
+  - ↳ `harness/job.py` baixa do bucket só o que está no manifesto e confere o SHA-256; os quatro candidatos carregam offline.
 - [x] **19.** Fazer o job falhar se algum candidato tentar baixar arquivos durante a inferência.
-  - ↳ Duas camadas: as variáveis de ambiente offline e o bloqueio de rede da VCN. Um teste negativo prova que a falha ocorre.
-  - ↳ Camada de aplicação em `dmb/offline.py` (bloqueia conexões fora do loopback), com teste em `tests/test_offline.py`. O gate de egresso de `harness/job.py` cobre a camada de rede.
+  - ↳ Camada de aplicação em `dmb/offline.py` (variáveis offline e bloqueio de conexões fora do loopback), com autoteste em cada execução e teste em `tests/test_offline.py`. Camada de rede pelo gate de egresso de `harness/job.py`.
 
 ## F2 — Tarefas de decisão e taxonomia
 
@@ -102,14 +99,14 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
   - ↳ As descrições das opções seguem o estilo de um *agent card*: curtas e orientadas à capacidade do agente.
 - [x] **22.** Limitar o primeiro ciclo a no máximo 20 opções por questão, para garantir compatibilidade com o Laya. *(Q2)*
   - ↳ Os subconjuntos de opções por exemplo simulam o serviço de elegibilidade de intenções.
-  - ↳ **Limite efetivo: 16 opções**, por causa do SemIf (Q2).
+  - ↳ Limite comum: **16 opções** (Q2).
 - [x] **23.** Incluir uma opção explícita de `outro` ou `sem correspondência` quando a taxonomia não for exaustiva.
 
 ## F3 — Dados e anotação
 
-- [x] **24.** Coletar textos PT-BR representativos do domínio de destino. *(Q7, Q15)*
+- [x] **24.** Coletar textos PT-BR representativos do domínio de destino. *(Q7)*
   - ↳ **100% sintéticos** (`datagen.generate`, na VM): 4.068 enunciados em 339 lotes (42 intenções × 7 perfis + 5 categorias fora de escopo × 9 lotes), geradores `llama-4-maverick` e `command-a` alternados.
-  - ↳ A unidade é a **conversa com vários turnos**, não o enunciado isolado. Cada turno guarda o estado (agente ativo e sessões suspensas).
+  - ↳ Para D2–D4 (ciclos futuros), a unidade é a conversa com vários turnos, com o estado de cada turno.
 - [x] **25.** Remover ou mascarar dados pessoais, segredos e identificadores que o benchmark não precisa.
 - [x] **26.** Separar os textos por domínio, comprimento, grau de ambiguidade e classe esperada.
   - ↳ Acrescentar a posição do turno e a presença de agente ativo ou de sessões suspensas.
@@ -123,7 +120,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
   - ↳ [06-guia-de-anotacao.md](06-guia-de-anotacao.md), usado literalmente pelos anotadores.
   - ↳ O guia cobre D1–D4 com exemplos-limite (por exemplo, quando um enunciado curto continua a tarefa do agente ativo e quando inicia um novo agente).
 - [x] **30.** Anotar cada exemplo com dois avaliadores independentes.
-  - ↳ Avaliadores = modelos generativos em rodízio (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`). *(Q15)*
+  - ↳ Avaliadores = modelos generativos em rodízio (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`). *(Q7)*
   - ↳ Resultado: 4057 anotados; 3992 consensos (98.4%); kappa por par entre 0.982 e 0.986; concordância com o rótulo de geração 97.9%. Relatório em `reports/datagen/annotation-report.json`.
 - [x] **31.** Resolver as discordâncias com a revisão de um terceiro avaliador.
 - [x] **32.** Registrar, para cada exemplo, a resposta de referência, a justificativa e a versão da taxonomia.
@@ -134,20 +131,20 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 - [x] **34.** Impedir que textos derivados do mesmo caso apareçam em mais de uma partição.
 - [x] **35.** Congelar o conjunto de teste final antes de qualquer ajuste de parâmetros.
   - ↳ Registrar o hash do arquivo congelado e guardar uma cópia em `logs-imutaveis`.
-  - ↳ Congelado em 2026-10-07: SHA-256 em `data/splits/MANIFEST.json`, cópias em `dmb-entrada` e `dmb-logs-imutaveis` (`splits/d1-v1/`), junto com os dados brutos da geração e da anotação.
+  - ↳ SHA-256 em `data/splits/MANIFEST.json`, cópias em `dmb-entrada` e `dmb-logs-imutaveis` (`splits/d1-v1/`), junto com os dados brutos da geração e da anotação.
 
 ## F4 — Contrato JEV e adaptadores
 
 - [x] **36.** Criar um formato canônico de entrada com `id`, `state`, `question`, `options`, `gold_label` e metadados.
   - ↳ Ver [02 §3](02-desenho-experimental.md#3-formato-canônico-de-entrada-tarefa-36), que inclui a **regra única de serialização** de `state`.
 - [x] **37.** Definir a versão do contrato JEV compatível a usar no benchmark: `POST /v1/systemone`, esquema de requisição, esquema de resposta e códigos de erro. *(Q1)*
-  - ↳ Versão `jev-compat-v1`. Os esquemas já estão em `contracts/jev/schemas/`; falta revisar os códigos de erro no código dos adaptadores.
+  - ↳ Versão `jev-compat-v1`, com esquemas em `contracts/jev/schemas/` e códigos de erro em `dmb/jev.py`.
 - [x] **38.** Definir o mapeamento obrigatório entre o contrato JEV e os tipos internos `choice`, `noul` e `score`.
 - [x] **39.** Definir a regra de conversão de probabilidades, confiança, níveis ordinais, opções descritas e campos de uso.
 - [x] **40.** Definir o comportamento padronizado para entradas inválidas, limite de contexto, timeout, opção desconhecida e indisponibilidade do modelo.
   - ↳ Na prática, uma falha do modelo de decisão vira desambiguação ou fallback no orquestrador. No benchmark, essas falhas contam como erro e são reportadas à parte.
 - [x] **41.** Criar testes de conformidade com requisições e respostas JEV congeladas.
-  - ↳ `contracts/jev/fixtures/conformance.json` + `tests/` (35 testes).
+  - ↳ `contracts/jev/fixtures/conformance.json` e `tests/`.
 - [x] **42.** Criar um adaptador JEV local para o Laya com o checkpoint multilíngue fixado.
 - [x] **43.** Criar um adaptador JEV local para o SemIf em modo `direct`, com a revisão do Qwen fixada.
 - [x] **44.** Criar um adaptador JEV local para o GLiNER Decide usando `classify_text`.
@@ -160,7 +157,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 - [x] **50.** Validar que trocar de candidato não altera a requisição JEV nem o formato da resposta JEV.
 - [x] **51.** Implementar testes de sanidade com decisões triviais, opções permutadas e os três tipos de pergunta.
   - ↳ Incluir um teste de invariância à permutação das opções em D1 e D2 (a mesma escolha com outra ordem).
-  - ↳ `harness/sanity.py`. Primeira rodada em CPU (2026-10-07): sem violações de contrato nos 4 candidatos. Acertos: SemIf 8/8, Laya 7/8, Rizzo 7/8, GLiNER 5/8. Invariância à permutação: 4/4 em todos. Os próximos testes rodam na OCI.
+  - ↳ `harness/sanity.py`: os quatro candidatos passam em CPU e GPU, sem violações de contrato e com invariância à permutação 4/4 (`reports/sanity/oci/`).
 
 ## F5 — Controle de execução
 
@@ -172,9 +169,9 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 ## F6 — Piloto
 
 - [ ] **55.** Executar um piloto de 50 exemplos por candidato em CPU.
-  - ↳ Sanidade em CPU (us-chicago-1, sub-rede privada) aprovada nos 4 candidatos: Laya 125 ms, GLiNER 194 ms, Rizzo Flow 7,3 s, SemIf 16,4 s (latência mediana). *(Q11)*
+  - ↳ CPU: `VM.Standard.E4.Flex`, 8 OCPU, us-chicago-1, sub-rede privada. *(Q11)*
 - [ ] **56.** Executar um piloto de 50 exemplos por candidato em GPU.
-  - ↳ GPU em **sa-saopaulo-1, A10.1**, uma por vez *(Q14)*. Sanidade em GPU: Laya 21 ms, GLiNER 16 ms, SemIf 66 ms (latência mediana). Rizzo Flow 62 ms, depois de compilar o llama.cpp com CUDA para a glibc da imagem dos jobs (`infra/ds/build_llama_cuda.sh`).
+  - ↳ GPU: `VM.GPU.A10.1`, sa-saopaulo-1, execuções em fila. *(Q14)*
 - [ ] **57.** Medir memória de GPU, memória RAM, tempo de carga, tempo de aquecimento e falhas do piloto.
 - [ ] **58.** Ajustar apenas os parâmetros operacionais necessários para eliminar falhas de execução.
 
@@ -213,6 +210,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 ## F10 — Relatório e encerramento
 
 - [ ] **75.** Elaborar o relatório técnico com configuração, limitações, resultados e recomendação.
+  - ↳ Ao final, reestruturar o `README.md`: (1) apresentação executiva do benchmark, (2) resultados em formato executivo, (3) método, (4) detalhes do plano, estrutura e documentos.
 - [ ] **76.** Anexar ao relatório os manifestos de artefatos, hashes, configurações, logs, testes de conformidade e comandos de reprodução.
 - [ ] **77.** Arquivar os conjuntos congelados e os resultados no Object Storage com retenção definida.
 - [ ] **78.** Desligar notebooks, jobs, endpoints temporários e o NAT Gateway que não sejam mais necessários.

@@ -1,5 +1,5 @@
 # Configuração pré-registrada do benchmark.
-# Decisões e justificativas: docs/04-questoes-em-aberto.md
+# Decisões e justificativas: docs/04-decisoes-de-projeto.md
 # Este arquivo é congelado com hash no marco da tarefa 62.
 
 contract:

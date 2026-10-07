@@ -37,9 +37,9 @@ O andamento por fase fica no topo de [docs/03-plano-de-tarefas.md](docs/03-plano
 | [docs/01-contexto-arquitetural.md](docs/01-contexto-arquitetural.md) | Arquitetura de referência do orquestrador e onde o modelo de decisão atua |
 | [docs/02-desenho-experimental.md](docs/02-desenho-experimental.md) | Tarefas de decisão, formato dos dados, partições, métricas e regras de isolamento |
 | [docs/03-plano-de-tarefas.md](docs/03-plano-de-tarefas.md) | As 78 microtarefas organizadas em fases, com dependências e adaptações ao contexto de roteamento |
-| [docs/04-questoes-em-aberto.md](docs/04-questoes-em-aberto.md) | Decisões de projeto (Q1–Q13) e os mecanismos automatizados que as aplicam |
+| [docs/04-decisoes-de-projeto.md](docs/04-decisoes-de-projeto.md) | Decisões de projeto (Q1–Q14) e os mecanismos que as aplicam |
 | [docs/06-guia-de-anotacao.md](docs/06-guia-de-anotacao.md) | Guia de anotação, usado literalmente pelos anotadores |
-| [docs/05-ambiente-de-execucao.md](docs/05-ambiente-de-execucao.md) | Onde e como os scripts rodam: jobs e notebooks do OCI Data Science (a máquina local é só IDE) |
+| [docs/05-cenario-de-execucao.md](docs/05-cenario-de-execucao.md) | Cenário de execução: onde cada etapa roda, isolamento e fluxo dos dados |
 | [config/benchmark.yaml](config/benchmark.yaml) | Parâmetros e critérios pré-registrados, congelados na tarefa 62 |
 
 ## Estrutura do repositório
@@ -50,7 +50,7 @@ dmb/               Código comum: contrato JEV, formato canônico, servidor /v1/
 tests/             Testes de contrato, formato canônico, servidor e isolamento
 infra/oci/          Compartment, IAM, VCN, buckets, Data Science, VM e NAT (tarefas 1–10, 17, 78)
 infra/ds/           Jobs do Data Science: build dos ambientes, execução do benchmark e logs
-infra/vm/           remote.sh para a VM de trabalho (bloqueada; ver docs/05)
+infra/vm/           remote.sh: sincroniza o repositório e executa na VM de trabalho
 env/                Aquisição de artefatos, manifesto, Dockerfile por candidato e dependências fixadas (11–16)
 contracts/jev/      Contrato JEV jev-compat-v1: esquemas, mapeamento de tipos, fixtures de conformidade (36–41)
 data/taxonomy/      Taxonomia de intenções (intents-v1.yaml: 42 intenções, 13 domínios) (20–23)
