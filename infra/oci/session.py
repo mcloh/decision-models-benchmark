@@ -1,5 +1,7 @@
 """Sessão OCI do benchmark a partir das credenciais em .secrets/oci-credentials/."""
 import configparser
+import json
+import os
 from pathlib import Path
 
 import oci
@@ -7,6 +9,16 @@ import oci
 ROOT = Path(__file__).resolve().parents[2]
 CRED_DIR = ROOT / ".secrets" / "oci-credentials"
 REGION = "us-chicago-1"
+
+
+def settings() -> dict:
+    """Configuração local fora do Git (.secrets/oci-settings.json); variáveis DMB_* têm precedência."""
+    path = CRED_DIR.parent / "oci-settings.json"
+    data = json.loads(path.read_text()) if path.is_file() else {}
+    return {
+        "parent_compartment_path": os.environ.get("DMB_PARENT_COMPARTMENT", data.get("parent_compartment_path")),
+        "ssh_allowed_cidr": os.environ.get("DMB_SSH_CIDR", data.get("ssh_allowed_cidr")),
+    }
 
 
 def load_config(region: str = REGION, profile: str = "DEFAULT") -> dict:

@@ -9,7 +9,6 @@ Uso: python -m harness.sanity --candidate laya --models-root models --device cpu
 """
 import argparse
 import json
-import platform
 import sys
 import time
 from pathlib import Path
@@ -76,7 +75,7 @@ def main():
         sanity.append(row)
 
     report = {
-        "candidate": adapter.describe(), "device": args.device, "host": platform.node(),
+        "candidate": adapter.describe(), "device": args.device,
         "load_seconds": round(load_s, 2), **guard,
         "conformance": conformance, "sanity": sanity,
         "summary": {

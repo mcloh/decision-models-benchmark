@@ -31,6 +31,33 @@ PYTHONPATH=infra/oci .venv/bin/python infra/ds/jobs.py run --name <nome> --entry
     --env DMB_CANDIDATE=laya DMB_MODE=sanity --wait
 ```
 
+## GPU (sa-saopaulo-1)
+
+| Item | Valor |
+|------|-------|
+| Shape | `VM.GPU.A10.1`, **uma GPU por vez** (limite da região) — `infra/ds/gpu_queue.py` enfileira |
+| Dados | `dmb-artefatos-gru` (réplica server-side com `infra/oci/replicate.py`), resultados em `dmb-resultados-gru` |
+| Rede | Gerenciada (limite de VCNs da região esgotado). Isolamento no processo + autoteste `process_guard` (`DMB_ISOLATION=app`) |
+| Rizzo Flow em CUDA | O binário oficial do llama.cpp exige GLIBC 2.38; a imagem dos jobs tem 2.34. `infra/ds/build_llama_cuda.sh` compila o mesmo commit (`161755f`) com CUDA 12.8, sysroot glibc 2.17 e libstdc++ estática (maior GLIBC exigida: 2.27), publicado em `runtimes/rizzo_flow/cuda-latest.json` |
+
+```bash
+PYTHONPATH=infra/oci:infra/ds .venv/bin/python infra/ds/gpu_queue.py sanity laya gliner semif rizzo_flow
+```
+
+## Dados sintéticos (na VM)
+
+```bash
+export DMB_OCI_AUTH=instance_principal DMB_COMPARTMENT_OCID=<ocid do compartment>
+python -m datagen.generate --out /data/runs/datagen-v1      # OCI Generative AI (us-chicago-1)
+python -m datagen.prepare  --run /data/runs/datagen-v1
+python -m datagen.annotate --run /data/runs/datagen-v1
+python -m datagen.build    --run /data/runs/datagen-v1 --freeze
+```
+
+## Configuração local sensível
+
+Fora do Git, em `.secrets/`: credenciais OCI, chaves SSH, o catálogo de artefatos com OCIDs (`artefatos-OCI.md`) e `oci-settings.json` (caminho do compartimento pai e CIDR autorizado para SSH; variáveis `DMB_PARENT_COMPARTMENT` e `DMB_SSH_CIDR` têm precedência). `tests/test_sensitive.py` falha se OCIDs, chaves, IPs públicos ou valores de `.secrets/oci-settings.json` aparecerem em arquivos versionados.
+
 ## VM de trabalho
 
 | Item | Valor |

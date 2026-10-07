@@ -12,7 +12,7 @@ def test_external_connection_is_blocked():
     s = socket.socket()
     try:
         with pytest.raises(NetworkAccessBlocked):
-            s.connect(("93.184.216.34", 443))
+            s.connect(("203.0.113.10", 443))  # TEST-NET-3 (RFC 5737)
     finally:
         s.close()
 

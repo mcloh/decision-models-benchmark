@@ -9,7 +9,6 @@
     "probabilities_source": "native"
   },
   "device": "cpu",
-  "host": "host-local",
   "load_seconds": 6.55,
   "conformance": [
     {

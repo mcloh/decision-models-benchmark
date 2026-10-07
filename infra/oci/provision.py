@@ -13,16 +13,17 @@ from datetime import datetime, timezone
 
 import oci
 
-from session import CRED_DIR, REGION, load_config
+from session import CRED_DIR, REGION, load_config, settings
 
-PARENT_PATH = "root/<compartimento-pai>"
+# Caminho do compartimento pai e CIDR do SSH ficam fora do Git: .secrets/oci-settings.json
+PARENT_PATH = settings()["parent_compartment_path"]
 COMPARTMENT_NAME = "decision-models"
 TAGS = {"projeto": "benchmark-decisoes-ptbr", "ambiente": "benchmark"}  # centro_custo pendente (Q13)
 BUCKETS = ["entrada", "artefatos", "resultados", "logs-imutaveis"]
 VCN_CIDR = "10.20.0.0/16"
 SUBNET_CIDR = "10.20.1.0/24"
 DEV_SUBNET_CIDR = "10.20.2.0/24"
-SSH_ALLOWED_CIDR = os.environ.get("DMB_SSH_CIDR", "203.0.113.1/32")
+SSH_ALLOWED_CIDR = settings()["ssh_allowed_cidr"]
 # VM de trabalho criada pelo usuário no console (o lançamento via API é negado neste compartment).
 VM_NAME = "instance-20261007-1206"
 VM_SSH_KEY = ".secrets/ssh/ssh-key-oci.key"

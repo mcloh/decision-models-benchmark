@@ -24,6 +24,12 @@ O resultado é um relatório técnico com uma recomendação. Todos os resultado
 
 Cada candidato é exposto por um adaptador local com o mesmo contrato JEV (`POST /v1/systemone`). Assim, o *harness* não sabe qual modelo está respondendo.
 
+## Andamento
+
+O andamento por fase fica no topo de [docs/03-plano-de-tarefas.md](docs/03-plano-de-tarefas.md), regenerado com `python tools/plan_progress.py` a cada atualização do plano.
+
+**Primeiro ciclo:** classificação de intenções (D1) no atendimento de telefonia móvel, com dados 100% sintéticos anotados por três modelos generativos. CPU em us-chicago-1 (sub-rede privada) e GPU A10 em sa-saopaulo-1.
+
 ## Documentação
 
 | Documento | Conteúdo |
@@ -32,6 +38,7 @@ Cada candidato é exposto por um adaptador local com o mesmo contrato JEV (`POST
 | [docs/02-desenho-experimental.md](docs/02-desenho-experimental.md) | Tarefas de decisão, formato dos dados, partições, métricas e regras de isolamento |
 | [docs/03-plano-de-tarefas.md](docs/03-plano-de-tarefas.md) | As 78 microtarefas organizadas em fases, com dependências e adaptações ao contexto de roteamento |
 | [docs/04-questoes-em-aberto.md](docs/04-questoes-em-aberto.md) | Decisões de projeto (Q1–Q13) e os mecanismos automatizados que as aplicam |
+| [docs/06-guia-de-anotacao.md](docs/06-guia-de-anotacao.md) | Guia de anotação, usado literalmente pelos anotadores |
 | [docs/05-ambiente-de-execucao.md](docs/05-ambiente-de-execucao.md) | Onde e como os scripts rodam: jobs e notebooks do OCI Data Science (a máquina local é só IDE) |
 | [config/benchmark.yaml](config/benchmark.yaml) | Parâmetros e critérios pré-registrados, congelados na tarefa 62 |
 
@@ -46,12 +53,14 @@ infra/ds/           Jobs do Data Science: build dos ambientes, execução do ben
 infra/vm/           remote.sh para a VM de trabalho (bloqueada; ver docs/05)
 env/                Aquisição de artefatos, manifesto, Dockerfile por candidato e dependências fixadas (11–16)
 contracts/jev/      Contrato JEV jev-compat-v1: esquemas, mapeamento de tipos, fixtures de conformidade (36–41)
-data/taxonomy/      Taxonomia de intenções/agentes e definição das tarefas de decisão (20–23)
+data/taxonomy/      Taxonomia de intenções (intents-v1.yaml: 42 intenções, 13 domínios) (20–23)
+datagen/           Pipeline sintético: geração, mascaramento/deduplicação, anotação por 3 LLMs, partições (24–36)
 data/raw/           Enunciados coletados e anonimizados — não versionar dados sensíveis (24–25)
 data/annotated/     Anotações, adjudicação e referência (29–32)
 data/splits/        Partições dev / calibração / teste congeladas (33–35)
 adapters/<modelo>/  Adaptadores JEV locais por candidato (42–51)
-harness/            Execução, controle de seeds/lotes/truncamento, coleta de medições (52–66)
+harness/            Execução nos jobs (job.py), sanidade, servidor, auditoria do bucket (18–19, 41, 51–66)
+tools/             Utilitários do repositório (andamento do plano)
 analysis/           Métricas, cortes, análise de erros e gráficos (67–74)
 reports/            Relatório técnico e anexos de reprodução (75–76)
 ```
