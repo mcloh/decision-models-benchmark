@@ -1,0 +1,12 @@
+# Preços públicos OCI (pay-as-you-go, USD), consultados em 2026-10-07 na API pública de preços
+# (apexapps.oracle.com/pls/apex/cetools/api/v1/products). Entrada só da análise de custo (tarefa 70);
+# não afeta predições e por isso fica fora do congelamento.
+source: oci-public-price-list
+retrieved: 2026-10-07
+parts:
+  B95909: {name: "Compute - GPU - A10", unit: GPU-hora, usd: 2.00}
+  B93113: {name: "Compute - Standard - E4 - OCPU", unit: OCPU-hora, usd: 0.025}
+  B93114: {name: "Compute - Standard - E4 - Memory", unit: GB-hora, usd: 0.0015}
+usd_per_hour:
+  gpu_a10: 2.00                 # VM.GPU.A10.1 (1 GPU)
+  cpu_e4_8ocpu_64gb: 0.296      # 8 × 0,025 + 64 × 0,0015

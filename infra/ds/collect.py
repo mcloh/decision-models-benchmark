@@ -27,6 +27,7 @@ def main():
     ap.add_argument("--split", default="dev")
     ap.add_argument("--examples", type=int)
     ap.add_argument("--dest", required=True)
+    ap.add_argument("--all-reps", action="store_true", help="guarda cada repetição (DMB_REP) em separado")
     args = ap.parse_args()
     dest = ROOT / args.dest
     dest.mkdir(parents=True, exist_ok=True)
@@ -45,21 +46,23 @@ def main():
                 continue
             if s.get("operational_env"):  # execuções exploratórias com parâmetros alterados ficam de fora
                 continue
-            key = (s["candidate"]["name"], s["device"])
+            key = (s["candidate"]["name"], s["device"]) + ((s.get("repetition", 1),) if args.all_reps else ())
             run_id = n.split("/")[1]
             if key not in latest or run_id > latest[key][0]:
                 pred = n.replace("summary-", "predictions-").replace(".json", ".jsonl")
                 latest[key] = (run_id, s, c, ns, bucket, pred, region)
     rows = []
-    for (cand, dev), (run_id, s, c, ns, bucket, pred, region) in sorted(latest.items()):
+    for key, (run_id, s, c, ns, bucket, pred, region) in sorted(latest.items()):
+        cand, dev = key[0], key[1]
+        suffix = f"-{dev}-r{key[2]}" if args.all_reps else f"-{dev}"
         s["oci"] = {"region": region, "run_id": run_id}
-        (dest / f"summary-{cand}-{dev}.json").write_text(json.dumps(s, indent=2, ensure_ascii=False) + "\n")
+        (dest / f"summary-{cand}{suffix}.json").write_text(json.dumps(s, indent=2, ensure_ascii=False) + "\n")
         try:
-            (dest / f"predictions-{cand}-{dev}.jsonl").write_bytes(c.get_object(ns, bucket, pred).data.content)
+            (dest / f"predictions-{cand}{suffix}.jsonl").write_bytes(c.get_object(ns, bucket, pred).data.content)
         except oci.exceptions.ServiceError:
             pass
         q, lat, cal = s["quality"], s["latency_ms"], s.get("calibration_raw", {})
-        rows.append(f"| {cand} | {dev} | {s.get('precision') or '—'} | {q.get('n', 0)} | "
+        rows.append(f"| {cand} | {dev}{' r' + str(key[2]) if args.all_reps else ''} | {s.get('precision') or '—'} | {q.get('n', 0)} | "
                     f"{fmt(q.get('accuracy', 0) * 100)}% | {fmt(q.get('macro_f1', 0) * 100)}% | "
                     f"{fmt(cal.get('ece'), 3)} | {fmt(lat['p50'])} | {fmt(lat['p95'])} | {fmt(lat['p99'])} | "
                     f"{fmt(s['load_seconds'])} | {fmt(s.get('rss_peak_mib'), 0)} | {fmt(s.get('gpu_mem_peak_mib'), 0)} | "
