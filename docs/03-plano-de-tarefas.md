@@ -20,7 +20,7 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 58 de 78 tarefas concluídas (74%), 2 em andamento.
+**Andamento em 2026-10-07:** 70 de 78 tarefas concluídas (89%), 2 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
@@ -32,10 +32,10 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F5 — Controle de execução | 3 | 0 | 0 |
 | F6 — Piloto | 4 | 0 | 0 |
 | F7 — Desenvolvimento e calibração | 4 | 0 | 0 |
-| F8 — Teste final | 0 | 0 | 4 |
-| F9 — Métricas e análise | 0 | 0 | 8 |
+| F8 — Teste final | 4 | 0 | 0 |
+| F9 — Métricas e análise | 8 | 0 | 0 |
 | F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **58** | **2** | **18** |
+| **Total** | **70** | **2** | **6** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -196,27 +196,32 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 
 ## F8 — Teste final
 
-- [ ] **63.** Executar uma rodada de acurácia no teste final com lote 1.
-- [ ] **64.** Executar uma rodada de acurácia no teste final com o lote de produção definido. *(Q6)*
+- [x] **63.** Executar uma rodada de acurácia no teste final com lote 1.
+  - ↳ 1.744 exemplos, sem erros: SemIf 87,2%, Rizzo Flow 85,4%, GLiNER 57,0%, Laya 56,8% (GPU). [`reports/test/`](../reports/test/README.md)
+- [x] **64.** Executar uma rodada de acurácia no teste final com o lote de produção definido. *(Q6)*
   - ↳ Lote de produção = 1 (contrato por requisição): coincide com a rodada da tarefa 63.
-- [ ] **65.** Executar uma rodada de várias decisões sobre o mesmo texto, quando esse padrão existir no caso de uso.
+- [x] **65.** Executar uma rodada de várias decisões sobre o mesmo texto, quando esse padrão existir no caso de uso.
   - ↳ Corresponde a D4 e a combinações por turno (por exemplo, D2 + D1). Medir a latência somada por turno.
   - ↳ Não se aplica neste ciclo: só D1 é avaliada; D4 depende de agentes implementados.
-- [ ] **66.** Repetir cada medição de desempenho depois do aquecimento, em pelo menos três execuções independentes.
+- [x] **66.** Repetir cada medição de desempenho depois do aquecimento, em pelo menos três execuções independentes.
+  - ↳ Três jobs independentes por candidato e dispositivo: predições idênticas e desvio-padrão do p95 abaixo de 2 ms em GPU.
 
 ## F9 — Métricas e análise
 
-- [ ] **67.** Coletar accuracy, macro F1, precision, recall e matriz de confusão.
+- [x] **67.** Coletar accuracy, macro F1, precision, recall e matriz de confusão.
   - ↳ Acrescentar a taxa de rota errada com confiança alta.
-- [ ] **68.** Coletar Brier score, ECE, cobertura e acurácia seletiva quando houver probabilidades ou abstenção.
-- [ ] **69.** Coletar latência p50, p95 e p99, vazão, uso de GPU, uso de RAM e consumo de armazenamento.
+- [x] **68.** Coletar Brier score, ECE, cobertura e acurácia seletiva quando houver probabilidades ou abstenção.
+- [x] **69.** Coletar latência p50, p95 e p99, vazão, uso de GPU, uso de RAM e consumo de armazenamento.
   - ↳ Reportar a latência por decisão e por turno.
-- [ ] **70.** Calcular o custo estimado por mil decisões em cada cenário de execução.
-- [ ] **71.** Criar cortes dos resultados por domínio, número de opções, comprimento e dificuldade do texto.
+- [x] **70.** Calcular o custo estimado por mil decisões em cada cenário de execução.
+  - ↳ Preços públicos em `config/pricing.yaml`: GPU A10 ≈ US$ 0,07 (modelos de 4B) e US$ 0,012 (encoders) por mil decisões.
+- [x] **71.** Criar cortes dos resultados por domínio, número de opções, comprimento e dificuldade do texto.
   - ↳ Acrescentar os cortes por tarefa de decisão, posição do turno, com ou sem agente ativo e categoria adversarial.
-- [ ] **72.** Inspecionar manualmente os erros de alto impacto e as discordâncias entre os modelos.
-- [ ] **73.** Classificar os erros em: taxonomia, contexto insuficiente, ambiguidade, linguagem, truncamento, instrução ou desempenho do modelo.
-- [ ] **74.** Gerar tabelas comparativas e gráficos a partir dos arquivos de resultados versionados. *(Q9)*
+- [x] **72.** Inspecionar manualmente os erros de alto impacto e as discordâncias entre os modelos.
+  - ↳ A maior classe de rotas erradas com confiança alta é "intenção correta fora das opções elegíveis"; recomendação de aplicar a elegibilidade depois da classificação.
+- [x] **73.** Classificar os erros em: taxonomia, contexto insuficiente, ambiguidade, linguagem, truncamento, instrução ou desempenho do modelo.
+- [x] **74.** Gerar tabelas comparativas e gráficos a partir dos arquivos de resultados versionados. *(Q9)*
+  - ↳ `analysis/report.py` e `analysis/charts.py`. O baseline LLM (Q9) não foi executado neste ciclo; H1 usa o critério absoluto.
   - ↳ Incluir intervalos de confiança (bootstrap) e testes pareados entre candidatos.
 
 ## F10 — Relatório e encerramento

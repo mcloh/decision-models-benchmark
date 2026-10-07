@@ -1,0 +1,59 @@
+{
+  "candidate": {
+    "name": "gliner",
+    "model_id": "gliner@a35a0cd3b7a0",
+    "revision": "a35a0cd3b7a0f00f2effc576f454cd48fa98aa5f",
+    "adapter_version": "0.2.0",
+    "device": "cpu",
+    "context_limit": 4096,
+    "probabilities_source": "native"
+  },
+  "precision": "float32",
+  "device": "cpu",
+  "split": "test",
+  "examples": 1744,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "repetition": 1,
+  "load_seconds": 19.66,
+  "warmup_latency_ms": [
+    365.5,
+    327.9,
+    340.4,
+    180.3,
+    263.5
+  ],
+  "latency_ms": {
+    "n": 1739,
+    "p50": 265.063261000023,
+    "p95": 468.24034399991206,
+    "p99": 520.1501504400356,
+    "mean": 276.1667364364575
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 136,
+  "rss_peak_mib": 3272.22265625,
+  "quality": {
+    "n": 1744,
+    "errors": 0,
+    "accuracy": 0.569954128440367,
+    "macro_f1": 0.5794749896128905,
+    "macro_precision": 0.7287383692866102,
+    "macro_recall": 0.562777593678045
+  },
+  "calibration_raw": {
+    "brier": 0.5973163504041061,
+    "nll": 1.3014295113471401,
+    "ece": 0.09860081962660566
+  },
+  "oci": {
+    "region": "us-chicago-1",
+    "run_id": "20261007T215729Z-gliner-evaluate"
+  }
+}

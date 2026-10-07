@@ -1,0 +1,61 @@
+{
+  "candidate": {
+    "name": "rizzo_flow",
+    "model_id": "rizzo_flow@55633c8cbd2b",
+    "revision": "55633c8cbd2b826bd3eefdeb05310450996649df",
+    "adapter_version": "0.2.0",
+    "device": "cuda",
+    "context_limit": 2048,
+    "probabilities_source": "native"
+  },
+  "precision": "gguf-q8_0",
+  "device": "cuda",
+  "split": "test",
+  "examples": 1744,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "repetition": 1,
+  "load_seconds": 5.28,
+  "warmup_latency_ms": [
+    132.2,
+    101.6,
+    101.9,
+    77.6,
+    102.4
+  ],
+  "latency_ms": {
+    "n": 1739,
+    "p50": 114.59288800000422,
+    "p95": 181.0838939000206,
+    "p99": 185.6001338800058,
+    "mean": 126.07259323289226
+  },
+  "errors": {},
+  "truncated": 0,
+  "with_diagnostics": 0,
+  "operational_env": {},
+  "state_tokens_max": 126,
+  "rss_peak_mib": 4532.33203125,
+  "gpu_mem_peak_mib": 5115.0,
+  "gpu_util_mean_pct": 75.4760820045558,
+  "quality": {
+    "n": 1744,
+    "errors": 0,
+    "accuracy": 0.8543577981651376,
+    "macro_f1": 0.8770666746856607,
+    "macro_precision": 0.858397796047086,
+    "macro_recall": 0.9122970471150125
+  },
+  "calibration_raw": {
+    "brier": 0.228059515858952,
+    "nll": 0.5092075237954721,
+    "ece": 0.03709107184248669
+  },
+  "oci": {
+    "region": "sa-saopaulo-1",
+    "run_id": "20261007T221342Z-rizzo_flow-evaluate"
+  }
+}

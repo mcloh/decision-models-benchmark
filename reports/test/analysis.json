@@ -1,0 +1,1943 @@
+{
+  "split": "test",
+  "criteria": {
+    "latency_gpu_batch1": {
+      "p95_ms_per_decision": 150
+    },
+    "accuracy": {
+      "tasks": [
+        "D1",
+        "D2"
+      ],
+      "non_inferiority_margin_pp": 3.0,
+      "ci": 0.95,
+      "bootstrap_unit": "group_id",
+      "fallback_macro_f1_min": 0.8
+    },
+    "risk": {
+      "max_confident_wrong_route_rate": 0.02,
+      "min_coverage": 0.8
+    }
+  },
+  "candidates": {
+    "gliner": {
+      "cpu": {
+        "device": "cpu",
+        "precision": "float32",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.57,
+          "accuracy_ci95": [
+            0.5263,
+            0.6145
+          ],
+          "macro_f1": 0.5795,
+          "macro_precision": 0.7287,
+          "macro_recall": 0.5628,
+          "fallback_recall": 0.5873,
+          "fallback_precision": 0.4029
+        },
+        "calibration": {
+          "temperature": 0.8187,
+          "raw": {
+            "brier": 0.5973,
+            "nll": 1.3014,
+            "ece": 0.0986
+          },
+          "calibrated": {
+            "brier": 0.5893,
+            "nll": 1.2793,
+            "ece": 0.0785
+          }
+        },
+        "abstention": {
+          "threshold": 0.856167,
+          "coverage": 0.1279,
+          "selective_accuracy": 0.8475,
+          "confident_wrong_rate": 0.0195
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 267.31,
+            "sd": 4.88
+          },
+          "p95": {
+            "mean": 481.32,
+            "sd": 11.69
+          },
+          "p99": {
+            "mean": 537.18,
+            "sd": 15.38
+          },
+          "mean": {
+            "mean": 281.08,
+            "sd": 4.76
+          }
+        },
+        "throughput_decisions_per_s": 3.56,
+        "cost_usd_per_1k_decisions": 0.0231,
+        "load_seconds": 19.863333333333333,
+        "rss_peak_mib": 3275.6171875,
+        "gpu_mem_peak_mib": null,
+        "storage_mib": {
+          "weights": 1112,
+          "environment": 4115
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_pacote_adicional",
+            "n": 49
+          },
+          {
+            "gold": "conta_explicacao",
+            "pred": "sem_correspondencia",
+            "n": 30
+          },
+          {
+            "gold": "roaming_pacote",
+            "pred": "internet_pacote_adicional",
+            "n": 22
+          },
+          {
+            "gold": "marketplace_pedido",
+            "pred": "sem_correspondencia",
+            "n": 21
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "suporte_sem_sinal",
+            "n": 20
+          },
+          {
+            "gold": "conta_contestacao",
+            "pred": "sem_correspondencia",
+            "n": 19
+          },
+          {
+            "gold": "negociacao_divida",
+            "pred": "sem_correspondencia",
+            "n": 17
+          },
+          {
+            "gold": "conta_vencimento",
+            "pred": "sem_correspondencia",
+            "n": 16
+          },
+          {
+            "gold": "conta_pagamento_confirmacao",
+            "pred": "sem_correspondencia",
+            "n": 16
+          },
+          {
+            "gold": "recarga_saldo",
+            "pred": "sem_correspondencia",
+            "n": 16
+          }
+        ],
+        "error_classes": {
+          "abstencao_indevida": 329,
+          "taxonomia_par_dificil": 100,
+          "intencao_fora_das_opcoes": 88,
+          "fora_de_escopo_aceito": 66,
+          "desempenho_do_modelo": 65,
+          "linguagem": 56,
+          "ambiguidade": 46
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.5618
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.6084
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.4956
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.4812
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.6065
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.6016
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.62
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.5521
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.5136
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.6031
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.6102
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.5477
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.7119
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.3803
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.5868
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.5779
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.5963
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.5629
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.5727
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 0.6667
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.5735
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.5492
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.5267
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.5844
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.5909
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.4306
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.7207
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.4612
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.7119
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.7222
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.5586
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.3738
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.2778
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.6019
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.4537
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.3148
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.8169
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.5385
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.785
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.5728
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.3333
+            }
+          }
+        }
+      },
+      "cuda": {
+        "device": "cuda",
+        "precision": "float32",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.57,
+          "accuracy_ci95": [
+            0.5263,
+            0.6145
+          ],
+          "macro_f1": 0.5795,
+          "macro_precision": 0.7287,
+          "macro_recall": 0.5628,
+          "fallback_recall": 0.5873,
+          "fallback_precision": 0.4029
+        },
+        "calibration": {
+          "temperature": 0.8187,
+          "raw": {
+            "brier": 0.5973,
+            "nll": 1.3014,
+            "ece": 0.0986
+          },
+          "calibrated": {
+            "brier": 0.5893,
+            "nll": 1.2793,
+            "ece": 0.0785
+          }
+        },
+        "abstention": {
+          "threshold": 0.857453,
+          "coverage": 0.1279,
+          "selective_accuracy": 0.8475,
+          "confident_wrong_rate": 0.0195
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 20.8,
+            "sd": 0.36
+          },
+          "p95": {
+            "mean": 31.71,
+            "sd": 0.06
+          },
+          "p99": {
+            "mean": 33.83,
+            "sd": 0.13
+          },
+          "mean": {
+            "mean": 21.76,
+            "sd": 0.17
+          }
+        },
+        "throughput_decisions_per_s": 45.96,
+        "cost_usd_per_1k_decisions": 0.0121,
+        "load_seconds": 21.646666666666665,
+        "rss_peak_mib": 3277.203125,
+        "gpu_mem_peak_mib": 1807.0,
+        "storage_mib": {
+          "weights": 1112,
+          "environment": 4115
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_pacote_adicional",
+            "n": 49
+          },
+          {
+            "gold": "conta_explicacao",
+            "pred": "sem_correspondencia",
+            "n": 30
+          },
+          {
+            "gold": "roaming_pacote",
+            "pred": "internet_pacote_adicional",
+            "n": 22
+          },
+          {
+            "gold": "marketplace_pedido",
+            "pred": "sem_correspondencia",
+            "n": 21
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "suporte_sem_sinal",
+            "n": 20
+          },
+          {
+            "gold": "conta_contestacao",
+            "pred": "sem_correspondencia",
+            "n": 19
+          },
+          {
+            "gold": "negociacao_divida",
+            "pred": "sem_correspondencia",
+            "n": 17
+          },
+          {
+            "gold": "conta_vencimento",
+            "pred": "sem_correspondencia",
+            "n": 16
+          },
+          {
+            "gold": "conta_pagamento_confirmacao",
+            "pred": "sem_correspondencia",
+            "n": 16
+          },
+          {
+            "gold": "recarga_saldo",
+            "pred": "sem_correspondencia",
+            "n": 16
+          }
+        ],
+        "error_classes": {
+          "abstencao_indevida": 329,
+          "taxonomia_par_dificil": 100,
+          "intencao_fora_das_opcoes": 88,
+          "fora_de_escopo_aceito": 66,
+          "desempenho_do_modelo": 65,
+          "linguagem": 56,
+          "ambiguidade": 46
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.5618
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.6084
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.4956
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.4812
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.6065
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.6016
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.62
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.5521
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.5136
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.6031
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.6102
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.5477
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.7119
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.3803
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.5868
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.5779
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.5963
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.5629
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.5727
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 0.6667
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.5735
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.5492
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.5267
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.5844
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.5909
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.4306
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.7207
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.4612
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.7119
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.7222
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.5586
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.3738
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.2778
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.6019
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.4537
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.3148
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.8169
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.5385
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.785
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.5728
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.3333
+            }
+          }
+        }
+      }
+    },
+    "laya": {
+      "cpu": {
+        "device": "cpu",
+        "precision": "float32",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.5682,
+          "accuracy_ci95": [
+            0.5301,
+            0.6058
+          ],
+          "macro_f1": 0.5902,
+          "macro_precision": 0.5858,
+          "macro_recall": 0.6345,
+          "fallback_recall": 0.2884,
+          "fallback_precision": 0.645
+        },
+        "calibration": {
+          "temperature": 3.5787,
+          "raw": {
+            "brier": 0.6841,
+            "nll": 2.2273,
+            "ece": 0.2689
+          },
+          "calibrated": {
+            "brier": 0.5969,
+            "nll": 1.3967,
+            "ece": 0.079
+          }
+        },
+        "abstention": {
+          "threshold": 0.871532,
+          "coverage": 0.1044,
+          "selective_accuracy": 0.8681,
+          "confident_wrong_rate": 0.0138
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 163.61,
+            "sd": 10.11
+          },
+          "p95": {
+            "mean": 200.86,
+            "sd": 11.59
+          },
+          "p99": {
+            "mean": 256.99,
+            "sd": 14.62
+          },
+          "mean": {
+            "mean": 153.95,
+            "sd": 9.89
+          }
+        },
+        "throughput_decisions_per_s": 6.5,
+        "cost_usd_per_1k_decisions": 0.0127,
+        "load_seconds": 8.993333333333334,
+        "rss_peak_mib": 2689.3359375,
+        "gpu_mem_peak_mib": null,
+        "storage_mib": {
+          "weights": 647,
+          "environment": 4109
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "sem_correspondencia",
+            "pred": "cancelamento_linha",
+            "n": 26
+          },
+          {
+            "gold": "suporte_sem_sinal",
+            "pred": "internet_problema_conexao",
+            "n": 25
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_problema_conexao",
+            "n": 23
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "vas_cancelamento",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "reclamacao_atendimento",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_consumo",
+            "n": 13
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "seguranca_fraude",
+            "n": 13
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "atendimento_humano",
+            "n": 13
+          },
+          {
+            "gold": "seguranca_perda_roubo",
+            "pred": "seguranca_fraude",
+            "n": 10
+          },
+          {
+            "gold": "portabilidade",
+            "pred": "troca_numero",
+            "n": 10
+          }
+        ],
+        "error_classes": {
+          "taxonomia_par_dificil": 182,
+          "fora_de_escopo_aceito": 139,
+          "intencao_fora_das_opcoes": 128,
+          "desempenho_do_modelo": 91,
+          "linguagem": 83,
+          "ambiguidade": 70,
+          "abstencao_indevida": 60
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.6056
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.5858
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.5658
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.5314
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.5972
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.5578
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.532
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.5118
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.4795
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.6918
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.5847
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.5942
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.4025
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.0915
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.6105
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.59
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.5413
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.5591
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.5485
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 0.6667
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.5441
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.5574
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.5226
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.6062
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.6061
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.5556
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.6592
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.5479
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.4068
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.7222
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.6966
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.5607
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.3611
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.6019
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.7037
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.6574
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.3099
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.5288
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.5888
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.567
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.6667
+            }
+          }
+        }
+      },
+      "cuda": {
+        "device": "cuda",
+        "precision": "float32",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.5677,
+          "accuracy_ci95": [
+            0.529,
+            0.6049
+          ],
+          "macro_f1": 0.5902,
+          "macro_precision": 0.5866,
+          "macro_recall": 0.6343,
+          "fallback_recall": 0.2857,
+          "fallback_precision": 0.6391
+        },
+        "calibration": {
+          "temperature": 3.5787,
+          "raw": {
+            "brier": 0.6835,
+            "nll": 2.2246,
+            "ece": 0.2711
+          },
+          "calibrated": {
+            "brier": 0.5976,
+            "nll": 1.397,
+            "ece": 0.0824
+          }
+        },
+        "abstention": {
+          "threshold": 0.871532,
+          "coverage": 0.1026,
+          "selective_accuracy": 0.8659,
+          "confident_wrong_rate": 0.0138
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 21.7,
+            "sd": 0.18
+          },
+          "p95": {
+            "mean": 23.17,
+            "sd": 0.26
+          },
+          "p99": {
+            "mean": 25.11,
+            "sd": 0.63
+          },
+          "mean": {
+            "mean": 21.77,
+            "sd": 0.17
+          }
+        },
+        "throughput_decisions_per_s": 45.93,
+        "cost_usd_per_1k_decisions": 0.0121,
+        "load_seconds": 9.836666666666666,
+        "rss_peak_mib": 2795.09375,
+        "gpu_mem_peak_mib": 1811.0,
+        "storage_mib": {
+          "weights": 647,
+          "environment": 4109
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "sem_correspondencia",
+            "pred": "cancelamento_linha",
+            "n": 26
+          },
+          {
+            "gold": "suporte_sem_sinal",
+            "pred": "internet_problema_conexao",
+            "n": 25
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_problema_conexao",
+            "n": 23
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "vas_cancelamento",
+            "n": 15
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_consumo",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "reclamacao_atendimento",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "atendimento_humano",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "seguranca_fraude",
+            "n": 13
+          },
+          {
+            "gold": "seguranca_perda_roubo",
+            "pred": "seguranca_fraude",
+            "n": 10
+          },
+          {
+            "gold": "portabilidade",
+            "pred": "troca_numero",
+            "n": 10
+          }
+        ],
+        "error_classes": {
+          "taxonomia_par_dificil": 182,
+          "fora_de_escopo_aceito": 140,
+          "intencao_fora_das_opcoes": 128,
+          "desempenho_do_modelo": 90,
+          "linguagem": 82,
+          "ambiguidade": 71,
+          "abstencao_indevida": 61
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.6016
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.5858
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.5702
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.5314
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.5926
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.5538
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.536
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.5142
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.4795
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.694
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.5777
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.5942
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.3983
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.0915
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.6099
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.5882
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.5413
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.5591
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.5424
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 0.6667
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.5441
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.5574
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.5226
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.6078
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.6061
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.5417
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.6536
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.5525
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.4025
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.7222
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.6966
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.5607
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.375
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.6111
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.7037
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.6574
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.2958
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.5288
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.5888
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.567
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.619
+            }
+          }
+        }
+      }
+    },
+    "rizzo_flow": {
+      "cuda": {
+        "device": "cuda",
+        "precision": "gguf-q8_0",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.8544,
+          "accuracy_ci95": [
+            0.8324,
+            0.8762
+          ],
+          "macro_f1": 0.8771,
+          "macro_precision": 0.8584,
+          "macro_recall": 0.9123,
+          "fallback_recall": 0.6243,
+          "fallback_precision": 0.9593
+        },
+        "calibration": {
+          "temperature": 1.2523,
+          "raw": {
+            "brier": 0.2281,
+            "nll": 0.5092,
+            "ece": 0.0371
+          },
+          "calibrated": {
+            "brier": 0.2256,
+            "nll": 0.4926,
+            "ece": 0.0225
+          }
+        },
+        "abstention": {
+          "threshold": 0.923792,
+          "coverage": 0.4679,
+          "selective_accuracy": 0.9669,
+          "confident_wrong_rate": 0.0155
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 114.68,
+            "sd": 0.07
+          },
+          "p95": {
+            "mean": 180.82,
+            "sd": 0.43
+          },
+          "p99": {
+            "mean": 185.35,
+            "sd": 0.23
+          },
+          "mean": {
+            "mean": 125.95,
+            "sd": 0.31
+          }
+        },
+        "throughput_decisions_per_s": 7.94,
+        "cost_usd_per_1k_decisions": 0.07,
+        "load_seconds": 5.433333333333334,
+        "rss_peak_mib": 4534.83984375,
+        "gpu_mem_peak_mib": 5115.0,
+        "storage_mib": {
+          "weights": 4172,
+          "environment": 661
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "sem_correspondencia",
+            "pred": "conta_contestacao",
+            "n": 17
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "reclamacao_atendimento",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "internet_problema_conexao",
+            "n": 8
+          },
+          {
+            "gold": "vas_cancelamento",
+            "pred": "conta_contestacao",
+            "n": 8
+          },
+          {
+            "gold": "conta_explicacao",
+            "pred": "conta_contestacao",
+            "n": 7
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "roaming_duvida",
+            "n": 6
+          },
+          {
+            "gold": "atendimento_humano",
+            "pred": "reclamacao_atendimento",
+            "n": 6
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "marketplace_pedido",
+            "n": 6
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "plano_nova_linha",
+            "n": 5
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "vas_contratacao",
+            "n": 5
+          }
+        ],
+        "error_classes": {
+          "intencao_fora_das_opcoes": 106,
+          "taxonomia_par_dificil": 69,
+          "fora_de_escopo_aceito": 35,
+          "ambiguidade": 18,
+          "abstencao_indevida": 10,
+          "desempenho_do_modelo": 8,
+          "linguagem": 8
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.8924
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.8544
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.8465
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.7866
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.8519
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.8685
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.876
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.8341
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.7909
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.9024
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.8886
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.8554
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.8475
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.2465
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.9082
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.8772
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.8899
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.8382
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.8515
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 0.6667
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.8294
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.8361
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.8189
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.8828
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.8939
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.7222
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.8324
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.863
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.8517
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.8796
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.8759
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.8879
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.9028
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.8148
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.8704
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.8241
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.9014
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.8173
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.9065
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.8561
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.7143
+            }
+          }
+        }
+      }
+    },
+    "semif": {
+      "cuda": {
+        "device": "cuda",
+        "precision": "bfloat16",
+        "repetitions": 3,
+        "quality": {
+          "n": 1744,
+          "errors": 0,
+          "accuracy": 0.8721,
+          "accuracy_ci95": [
+            0.8495,
+            0.8941
+          ],
+          "macro_f1": 0.8889,
+          "macro_precision": 0.893,
+          "macro_recall": 0.897,
+          "fallback_recall": 0.7672,
+          "fallback_precision": 0.8555
+        },
+        "calibration": {
+          "temperature": 1.284,
+          "raw": {
+            "brier": 0.1921,
+            "nll": 0.4137,
+            "ece": 0.0416
+          },
+          "calibrated": {
+            "brier": 0.1885,
+            "nll": 0.3976,
+            "ece": 0.0154
+          }
+        },
+        "abstention": {
+          "threshold": 0.914887,
+          "coverage": 0.6216,
+          "selective_accuracy": 0.9742,
+          "confident_wrong_rate": 0.0161
+        },
+        "latency_ms": {
+          "p50": {
+            "mean": 120.7,
+            "sd": 1.05
+          },
+          "p95": {
+            "mean": 187.12,
+            "sd": 1.75
+          },
+          "p99": {
+            "mean": 189.8,
+            "sd": 1.62
+          },
+          "mean": {
+            "mean": 128.55,
+            "sd": 1.09
+          }
+        },
+        "throughput_decisions_per_s": 7.78,
+        "cost_usd_per_1k_decisions": 0.0714,
+        "load_seconds": 7.34,
+        "rss_peak_mib": 9028.6875,
+        "gpu_mem_peak_mib": 8513.0,
+        "storage_mib": {
+          "weights": 8910,
+          "environment": 4113
+        },
+        "prediction_agreement_across_reps": 1.0,
+        "top_confusions": [
+          {
+            "gold": "roaming_cobranca",
+            "pred": "conta_contestacao",
+            "n": 14
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "conta_contestacao",
+            "n": 9
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "recarga_saldo",
+            "n": 7
+          },
+          {
+            "gold": "marketplace_compra",
+            "pred": "sem_correspondencia",
+            "n": 7
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "roaming_duvida",
+            "n": 7
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "cadastro_atualizacao",
+            "n": 7
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "suporte_sem_sinal",
+            "n": 5
+          },
+          {
+            "gold": "vas_cancelamento",
+            "pred": "conta_contestacao",
+            "n": 5
+          },
+          {
+            "gold": "sem_correspondencia",
+            "pred": "reclamacao_atendimento",
+            "n": 5
+          },
+          {
+            "gold": "plano_consulta",
+            "pred": "internet_consumo",
+            "n": 4
+          }
+        ],
+        "error_classes": {
+          "intencao_fora_das_opcoes": 84,
+          "taxonomia_par_dificil": 62,
+          "abstencao_indevida": 49,
+          "ambiguidade": 17,
+          "desempenho_do_modelo": 4,
+          "fora_de_escopo_aceito": 4,
+          "linguagem": 3
+        },
+        "slices": {
+          "profile": {
+            "curto_neutro": {
+              "n": 251,
+              "accuracy": 0.9044
+            },
+            "emocional": {
+              "n": 309,
+              "accuracy": 0.8576
+            },
+            "erros_digitacao": {
+              "n": 228,
+              "accuracy": 0.886
+            },
+            "indireto_multiplo": {
+              "n": 239,
+              "accuracy": 0.7866
+            },
+            "informal_abreviado": {
+              "n": 216,
+              "accuracy": 0.8657
+            },
+            "longo_contexto": {
+              "n": 251,
+              "accuracy": 0.8685
+            },
+            "regionalismo": {
+              "n": 250,
+              "accuracy": 0.936
+            }
+          },
+          "n_options": {
+            "12": {
+              "n": 422,
+              "accuracy": 0.8578
+            },
+            "16": {
+              "n": 440,
+              "accuracy": 0.8523
+            },
+            "4": {
+              "n": 451,
+              "accuracy": 0.8869
+            },
+            "8": {
+              "n": 431,
+              "accuracy": 0.891
+            }
+          },
+          "kind": {
+            "intent": {
+              "n": 1508,
+              "accuracy": 0.8561
+            },
+            "oos": {
+              "n": 236,
+              "accuracy": 0.9746
+            }
+          },
+          "gold_eligible": {
+            "False": {
+              "n": 142,
+              "accuracy": 0.4085
+            },
+            "True": {
+              "n": 1602,
+              "accuracy": 0.9132
+            }
+          },
+          "length_bucket": {
+            "curto": {
+              "n": 578,
+              "accuracy": 0.91
+            },
+            "longo": {
+              "n": 109,
+              "accuracy": 0.8807
+            },
+            "medio": {
+              "n": 1057,
+              "accuracy": 0.8505
+            }
+          },
+          "sentiment": {
+            "ansioso": {
+              "n": 330,
+              "accuracy": 0.8576
+            },
+            "confuso": {
+              "n": 3,
+              "accuracy": 1.0
+            },
+            "frustrado": {
+              "n": 340,
+              "accuracy": 0.8794
+            },
+            "indignado": {
+              "n": 122,
+              "accuracy": 0.877
+            },
+            "irritado": {
+              "n": 243,
+              "accuracy": 0.8519
+            },
+            "neutro": {
+              "n": 640,
+              "accuracy": 0.8797
+            },
+            "positivo": {
+              "n": 66,
+              "accuracy": 0.8939
+            }
+          },
+          "domain": {
+            "atendimento": {
+              "n": 72,
+              "accuracy": 0.8194
+            },
+            "beneficios_fidelidade": {
+              "n": 179,
+              "accuracy": 0.838
+            },
+            "contas": {
+              "n": 219,
+              "accuracy": 0.9041
+            },
+            "fora_de_escopo": {
+              "n": 236,
+              "accuracy": 0.9831
+            },
+            "internet": {
+              "n": 108,
+              "accuracy": 0.9074
+            },
+            "linha_cadastro": {
+              "n": 145,
+              "accuracy": 0.8828
+            },
+            "marketplace": {
+              "n": 107,
+              "accuracy": 0.8505
+            },
+            "negociacao": {
+              "n": 72,
+              "accuracy": 0.8611
+            },
+            "plano": {
+              "n": 108,
+              "accuracy": 0.8056
+            },
+            "recarga": {
+              "n": 108,
+              "accuracy": 0.8611
+            },
+            "roaming": {
+              "n": 108,
+              "accuracy": 0.7315
+            },
+            "seguranca": {
+              "n": 71,
+              "accuracy": 0.9014
+            },
+            "servicos_adicionais": {
+              "n": 104,
+              "accuracy": 0.7981
+            },
+            "suporte": {
+              "n": 107,
+              "accuracy": 0.9065
+            }
+          },
+          "annotation": {
+            "consenso": {
+              "n": 1723,
+              "accuracy": 0.8752
+            },
+            "desempate": {
+              "n": 21,
+              "accuracy": 0.619
+            }
+          }
+        }
+      }
+    }
+  },
+  "pairwise_vs_best_gpu": {
+    "best": "semif",
+    "comparisons": {
+      "gliner": {
+        "accuracy_diff": 0.3022,
+        "ci95": [
+          0.2607,
+          0.3427
+        ],
+        "a_only": 603,
+        "b_only": 76,
+        "p_value": 1.0283351885027499e-102
+      },
+      "laya": {
+        "accuracy_diff": 0.3045,
+        "ci95": [
+          0.2653,
+          0.3464
+        ],
+        "a_only": 605,
+        "b_only": 74,
+        "p_value": 1.5972799301464988e-104
+      },
+      "rizzo_flow": {
+        "accuracy_diff": 0.0178,
+        "ci95": [
+          -0.0052,
+          0.0418
+        ],
+        "a_only": 127,
+        "b_only": 96,
+        "p_value": 0.044300169930155384
+      }
+    }
+  },
+  "criteria_check": {
+    "gliner": {
+      "H3_latency_p95_gpu": true,
+      "H1_macro_f1_absolute": false,
+      "H2_risk": false
+    },
+    "laya": {
+      "H3_latency_p95_gpu": true,
+      "H1_macro_f1_absolute": false,
+      "H2_risk": false
+    },
+    "rizzo_flow": {
+      "H3_latency_p95_gpu": false,
+      "H1_macro_f1_absolute": true,
+      "H2_risk": false
+    },
+    "semif": {
+      "H3_latency_p95_gpu": false,
+      "H1_macro_f1_absolute": true,
+      "H2_risk": false
+    }
+  }
+}

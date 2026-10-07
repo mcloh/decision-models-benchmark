@@ -42,7 +42,9 @@ def save(fig, path: Path):
 
 def load(dest: Path) -> dict:
     out = {}
-    for f in dest.glob("summary-*.json"):
+    for f in dest.glob(f"summary-*{REP}.json"):
+        if not REP and "-r" in f.stem.rsplit("-", 1)[-1]:
+            continue
         s = json.loads(f.read_text())
         out[(s["candidate"]["name"], s["device"])] = s
     return out
@@ -56,6 +58,7 @@ def style(ax, grid_axis="x"):
 
 
 LABEL = "piloto, 50 exemplos de dev"
+REP = ""  # "-r1" no teste final (coletado com --all-reps)
 
 
 def accuracy_chart(data, dest):
@@ -63,8 +66,22 @@ def accuracy_chart(data, dest):
                   key=lambda r: r[1])
     fig, ax = plt.subplots(figsize=(7, 2.8))
     bars = ax.barh([r[0] for r in rows], [r[1] for r in rows], height=0.55, color=GPU)
-    for bar, (_, v) in zip(bars, rows):
-        ax.text(v + 1, bar.get_y() + bar.get_height() / 2, f"{v:.0f}%", va="center", color=INK, fontsize=11)
+    analysis = dest / "analysis.json"
+    ci = {}
+    if analysis.exists():
+        inv = {v: k for k, v in NAMES.items()}
+        a = json.loads(analysis.read_text())["candidates"]
+        ci = {name: a[inv[name]]["cuda"]["quality"]["accuracy_ci95"] for name, _ in rows}
+    for bar, (name, v) in zip(bars, rows):
+        y = bar.get_y() + bar.get_height() / 2
+        x_text = v + 1
+        if name in ci:
+            lo, hi = ci[name][0] * 100, ci[name][1] * 100
+            ax.plot([lo, hi], [y, y], color=INK, linewidth=1.2)
+            ax.plot([lo, lo], [y - 0.1, y + 0.1], color=INK, linewidth=1.2)
+            ax.plot([hi, hi], [y - 0.1, y + 0.1], color=INK, linewidth=1.2)
+            x_text = hi + 1
+        ax.text(x_text, y, f"{v:.1f}%" if ci else f"{v:.0f}%", va="center", color=INK, fontsize=11)
     ax.set_xlim(0, 105)
     ax.set_xlabel("Acurácia (%)")
     ax.set_title(f"Acurácia por candidato — {LABEL}", loc="left", fontsize=12, color=INK)
@@ -112,7 +129,9 @@ def tradeoff_chart(data, dest):
             continue
         x, y = s["latency_ms"]["p95"], s["quality"]["accuracy"] * 100
         ax.scatter(x, y, s=80, color=GPU, edgecolor=SURFACE, linewidth=2, zorder=3)
-        ax.annotate(NAMES[c], (x, y), xytext=(8, -4), textcoords="offset points", color=INK, fontsize=10)
+        offset = {"semif": (6, 7), "rizzo_flow": (6, -15), "laya": (-6, 8), "gliner": (6, -15)}[c]
+        ax.annotate(NAMES[c], (x, y), xytext=offset, textcoords="offset points", color=INK, fontsize=10,
+                    ha="right" if offset[0] < 0 else "left")
     ax.set_xlim(0, 220)
     ax.set_ylim(30, 104)
     ax.set_xlabel("Latência p95 por decisão em GPU A10 (ms)")
@@ -127,16 +146,19 @@ def tradeoff_chart(data, dest):
 def options_chart(dest):
     """Acurácia por número de opções (GPU), uma linha por candidato com cor fixa e rótulo direto."""
     from collections import defaultdict
-    order = [c for c in ("semif", "rizzo_flow", "laya", "gliner") if (dest / f"predictions-{c}-cuda.jsonl").exists()]
+    order = [c for c in ("semif", "rizzo_flow", "laya", "gliner") if (dest / f"predictions-{c}-cuda{REP}.jsonl").exists()]
     if len(order) < 2:
         return
     fig, ax = plt.subplots(figsize=(7, 3.8))
     ends = []
     for c in order:
         byk = defaultdict(list)
-        for l in (dest / f"predictions-{c}-cuda.jsonl").open():
+        for l in (dest / f"predictions-{c}-cuda{REP}.jsonl").open():
             r = json.loads(l)
             byk[r["n_options"]].append(r["pred"] == r["gold"])
+        if sum(len(v) for v in byk.values()) < 200:  # amostra pequena demais para cortes
+            plt.close(fig)
+            return
         ks = sorted(byk)
         ys = [sum(byk[k]) / len(byk[k]) * 100 for k in ks]
         ax.plot(ks, ys, color=ENTITY[c], linewidth=2, marker="o", markersize=7,
@@ -157,6 +179,52 @@ def options_chart(dest):
     fig.tight_layout()
     save(fig, dest / "chart-acuracia-por-opcoes.svg")
     plt.close(fig)
+
+
+def coverage_chart(dest, cal, order, observed=False):
+    """Cobertura × risco com probabilidades calibradas; ponto = limiar congelado (observado no próprio conjunto)."""
+    from analysis.calibrate import apply_temperature
+    from analysis.metrics import selective
+    fig, ax = plt.subplots(figsize=(7, 4.2))
+    ax.axvline(2, color=INK_2, linewidth=1, linestyle=(0, (4, 3)))
+    ax.axhline(80, color=INK_2, linewidth=1, linestyle=(0, (1, 3)))
+    ax.text(2.15, 33, "risco máx. 2%", color=INK_2, fontsize=9)
+    label_at = {"semif": (0.25, 90), "rizzo_flow": (4.2, 47), "gliner": (4.6, 12), "laya": (4.6, 4)}
+    ax.text(15.8, 81.5, "meta de cobertura 80%", color=INK_2, fontsize=9, ha="right")
+    for c in order:
+        preds = [json.loads(l) for l in (dest / f"predictions-{c}-cuda{REP}.jsonl").open()]
+        t = cal[c]["cuda"]["temperature"]
+        rows_c = []
+        for r in preds:
+            if r.get("probabilities"):
+                p = apply_temperature(r["probabilities"], t)
+                rows_c.append({**r, "probabilities": p, "pred": max(p, key=p.get)})
+        xs, ys = [], []
+        for thr in [i / 200 for i in range(0, 201)]:
+            sres = selective(rows_c, thr)
+            xs.append(sres["confident_wrong_rate"] * 100)
+            ys.append(sres["coverage"] * 100)
+        ax.plot(xs, ys, color=ENTITY[c], linewidth=2)
+        chosen = cal[c]["cuda"]
+        if observed:
+            obs = selective(rows_c, chosen["threshold"])
+            chosen = {"coverage": obs["coverage"], "confident_wrong_rate": obs["confident_wrong_rate"]}
+        ax.scatter(chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100, s=60, color=ENTITY[c],
+                   edgecolor=SURFACE, linewidth=2, zorder=3)
+        ax.annotate(f"{NAMES[c]}: {chosen['coverage'] * 100:.0f}% de cobertura",
+                    (chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100),
+                    xytext=label_at[c], textcoords="data", color=INK, fontsize=10,
+                    arrowprops={"arrowstyle": "-", "color": INK_2, "linewidth": 0.8})
+    ax.set_xlim(0, 16)
+    ax.set_ylim(0, 102)
+    ax.set_xlabel("Rota errada com confiança alta (% do total)")
+    ax.set_ylabel("Cobertura (% decidido sem desambiguar)")
+    ax.set_title(f"Cobertura × risco por limiar de confiança — {LABEL}", loc="left", fontsize=12, color=INK)
+    style(ax, grid_axis="both")
+    fig.tight_layout()
+    save(fig, dest / "chart-cobertura-risco.svg")
+    plt.close(fig)
+
 
 
 def calibration_charts(dest):
@@ -203,43 +271,7 @@ def calibration_charts(dest):
     save(fig, dest / "chart-ece.svg")
     plt.close(fig)
 
-    # 3. Cobertura × risco (rota errada com confiança alta), probabilidades calibradas
-    fig, ax = plt.subplots(figsize=(7, 4.2))
-    ax.axvline(2, color=INK_2, linewidth=1, linestyle=(0, (4, 3)))
-    ax.axhline(80, color=INK_2, linewidth=1, linestyle=(0, (1, 3)))
-    ax.text(2.15, 33, "risco máx. 2%", color=INK_2, fontsize=9)
-    label_at = {"semif": (0.25, 90), "rizzo_flow": (4.2, 47), "gliner": (4.6, 12), "laya": (4.6, 4)}
-    ax.text(15.8, 81.5, "meta de cobertura 80%", color=INK_2, fontsize=9, ha="right")
-    for c in order:
-        preds = [json.loads(l) for l in (dest / f"predictions-{c}-cuda.jsonl").open()]
-        t = cal[c]["cuda"]["temperature"]
-        rows_c = []
-        for r in preds:
-            if r.get("probabilities"):
-                p = apply_temperature(r["probabilities"], t)
-                rows_c.append({**r, "probabilities": p, "pred": max(p, key=p.get)})
-        xs, ys = [], []
-        for thr in [i / 200 for i in range(0, 201)]:
-            sres = selective(rows_c, thr)
-            xs.append(sres["confident_wrong_rate"] * 100)
-            ys.append(sres["coverage"] * 100)
-        ax.plot(xs, ys, color=ENTITY[c], linewidth=2)
-        chosen = cal[c]["cuda"]
-        ax.scatter(chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100, s=60, color=ENTITY[c],
-                   edgecolor=SURFACE, linewidth=2, zorder=3)
-        ax.annotate(f"{NAMES[c]}: {chosen['coverage'] * 100:.0f}% de cobertura",
-                    (chosen["confident_wrong_rate"] * 100, chosen["coverage"] * 100),
-                    xytext=label_at[c], textcoords="data", color=INK, fontsize=10,
-                    arrowprops={"arrowstyle": "-", "color": INK_2, "linewidth": 0.8})
-    ax.set_xlim(0, 16)
-    ax.set_ylim(0, 102)
-    ax.set_xlabel("Rota errada com confiança alta (% do total)")
-    ax.set_ylabel("Cobertura (% decidido sem desambiguar)")
-    ax.set_title("Cobertura × risco ao variar o limiar de confiança (GPU)", loc="left", fontsize=12, color=INK)
-    style(ax, grid_axis="both")
-    fig.tight_layout()
-    save(fig, dest / "chart-cobertura-risco.svg")
-    plt.close(fig)
+    coverage_chart(dest, cal, order)
 
 
 def main():
@@ -250,6 +282,17 @@ def main():
         LABEL = sys.argv[sys.argv.index("--label") + 1]
     if kind == "calibration":
         calibration_charts(dest)
+    elif kind == "test":
+        global REP
+        REP = "-r1"
+        data = load(dest)
+        accuracy_chart(data, dest)
+        latency_chart(data, dest)
+        tradeoff_chart(data, dest)
+        options_chart(dest)
+        cal = json.loads((Path(__file__).resolve().parents[1] / "config" / "calibration.json").read_text())["candidates"]
+        coverage_chart(dest, cal, [c for c in ("semif", "rizzo_flow", "laya", "gliner") if (c, "cuda") in data],
+                       observed=True)
     else:
         data = load(dest)
         accuracy_chart(data, dest)
