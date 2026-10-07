@@ -98,8 +98,12 @@ def main():
     ap.add_argument("--state-budget", type=int, default=int(os.environ.get("DMB_STATE_BUDGET", "512")))
     args = ap.parse_args()
 
-    if args.split == "test" and not FROZEN.is_file():
-        raise SystemExit("partição de teste bloqueada: configuração ainda não congelada (tarefa 62)")
+    if args.split == "test":
+        if not FROZEN.is_file():
+            raise SystemExit("partição de teste bloqueada: configuração ainda não congelada (tarefa 62)")
+        from tools.freeze import current_hashes
+        if current_hashes() != json.loads(FROZEN.read_text())["files"]:
+            raise SystemExit("partição de teste bloqueada: arquivos mudaram depois do congelamento")
 
     enforce_offline()
     from dmb.offline import self_test
