@@ -11,7 +11,7 @@ As decisões do benchmark seguem um mesmo critério: preferir a **abordagem auto
 | Q3 | Isolamento de rede | Aquisição fora da rede dos jobs; medições sem acesso a fontes externas | Gate de egresso, bloqueio no processo e verificação por SHA-256 |
 | Q4 | Interfaces e licenças | Uma interface por candidato (abaixo); só licenças Apache-2.0 ou MIT | A aquisição lê a licença no Hub e falha fora da lista permitida |
 | Q5 | Critérios de sucesso | Limite de latência fixo e não inferioridade em relação ao baseline | Avaliação automática a partir de `config/benchmark.yaml` |
-| Q6 | Lote de produção | Por candidato: o maior lote com p95 dentro do limite | Varredura de lotes |
+| Q6 | Lote de produção | Lote 1 (contrato por requisição, decisão turno a turno) | Vazão medida com lote 1 |
 | Q7 | Dados e anotação | 100% sintéticos; anotação por três modelos generativos em rodízio | `datagen/` ([02 §4](02-desenho-experimental.md#4-dados)) |
 | Q8 | Contexto no `state` | Orçamento comum de tokens; D1 usa só o enunciado atual | `dmb.canonical.fit_state` |
 | Q9 | Baseline LLM | Incluído como referência, fora do ranking principal | Adaptador no mesmo contrato |
@@ -110,7 +110,7 @@ O limite comum é de **16 opções**, incluindo `sem_correspondencia`. Esse é o
 
 ## Q6 — Lote de produção
 
-A varredura de lotes {1, 2, 4, 8, 16, 32} em GPU define, por candidato, o maior lote com p95 por decisão dentro do limite. Lote 1 é o cenário principal, porque representa o caminho síncrono do orquestrador. O lote de produção serve para reportar vazão e custo.
+O contrato `POST /v1/systemone` é por requisição, e o orquestrador decide turno a turno, no caminho síncrono do usuário. Os adaptadores atendem uma requisição por vez, então **o lote de produção é 1** e a vazão por instância é medida com lote 1 (decisões por segundo = 1000 / latência média). Ganhos de vazão com lotes maiores ou com réplicas concorrentes ficam como trabalho futuro e não entram no ranking deste ciclo.
 
 ## Q7 — Dados sintéticos e anotação por modelos generativos
 

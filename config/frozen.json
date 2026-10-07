@@ -1,0 +1,72 @@
+{
+  "frozen_at": "2026-10-07T21:53:53+00:00",
+  "files": {
+    "config/benchmark.yaml": "53546bced660a618206023f3054ab478b0cba390369b4915c60374a4ff59b8f6",
+    "config/calibration.json": "2918aa77d2251f60d155d3f0be8271d5b72c0945412e270344359bb1e8f7fa28",
+    "data/splits/MANIFEST.json": "50377ab93dbaa71aa3220b722c2270fb76ddda4f5a24763ba4ad3623a2e704ac",
+    "env/artifacts-manifest.json": "2cde61d21cec5086a221af988bea5dfb9a31fb4f3269511e63a23ca2b2bbfb6c",
+    "contracts/jev/schemas/request.schema.json": "e44e5af9798b96453b676c05b216015fd2b62c9590301adce8c7807989774d35",
+    "contracts/jev/schemas/response.schema.json": "008f8c2e68064b46b0f0649e654326ffd65a4eb8c080e9d23a6be4ebc44cd752",
+    "harness/evaluate.py": "2c696e1da8c5e06284c73adf93b842cf7e541135e78dabd9cd1751825ec2866a",
+    "dmb/canonical.py": "833e92490c2a34b9469e8e9aa4ee3aea6f2411ad74165a8df129ce460c2fd8d7",
+    "dmb/jev.py": "eb9b97bc84d65d6481b3f86ea6f242c445bde02bfb0518bed735a15b802e66c9",
+    "dmb/server.py": "cb8a7515337de781c90918dc2a40e499a44d6db52e6a78ae31f98fa22d415249",
+    "dmb/adapter.py": "361e25b990a0de345fa79663f1593acf0bc62ef9580d6dfec1e35d4942a2839d",
+    "adapters/laya/adapter.py": "b332c57330f24a08334b794cd933e267dfd5f82b1b073bf6213abb42e1d6d6e8",
+    "adapters/semif/adapter.py": "83039c3e07dc2d64e809c3f33f3187a1e2fa3d8e5b20b204652dd673a354da3c",
+    "adapters/gliner/adapter.py": "e499caea077353ccdc6cf458e8cb5fde6f34ef7149d463726e6b5d199f435921",
+    "adapters/rizzo_flow/adapter.py": "8621b36f1b970ab778ff4af6c5e7cba3a933a0b2bfe6c6861f49dfd7c819d79b"
+  },
+  "environments": {
+    "laya": {
+      "candidate": "laya",
+      "object": "envs/laya/20261007T151753Z.tar.gz",
+      "sha256": "2003611792956150ce85ecc9ea7635f9b1f8dc7280c5da507e3a303188ed11aa",
+      "bytes": 4308288985,
+      "built_at": "20261007T151753Z",
+      "code_rev": "5d93903",
+      "python": "Python 3.11.9",
+      "home": "/home/datascience"
+    },
+    "gliner": {
+      "candidate": "gliner",
+      "object": "envs/gliner/20261007T151810Z.tar.gz",
+      "sha256": "fff384c86db233995f5a9182768bef0a8f27052436a3531f455027bde1d19954",
+      "bytes": 4314977274,
+      "built_at": "20261007T151810Z",
+      "code_rev": "5d93903",
+      "python": "Python 3.11.9",
+      "home": "/home/datascience"
+    },
+    "semif": {
+      "candidate": "semif",
+      "object": "envs/semif/20261007T151340Z.tar.gz",
+      "sha256": "50b090041721d0faa626ad44ebbcfa9b5c4b37ee9f6f69da181757580a4f5065",
+      "bytes": 4312946412,
+      "built_at": "20261007T151340Z",
+      "code_rev": "5d93903",
+      "python": "Python 3.11.9",
+      "home": "/home/datascience"
+    },
+    "rizzo_flow": {
+      "candidate": "rizzo_flow",
+      "object": "envs/rizzo_flow/20261007T151336Z.tar.gz",
+      "sha256": "805376a152a984010ca838e4134a9410f9c6e12ab97a0095297f7d7ea79b61c4",
+      "bytes": 693207602,
+      "built_at": "20261007T151336Z",
+      "code_rev": "5d93903",
+      "python": "Python 3.11.9",
+      "home": "/home/datascience"
+    },
+    "rizzo_flow_cuda_runtime": {
+      "object": "runtimes/rizzo_flow/llama-b11081-linux-x64-cuda-dsjobs-20261007T165909Z.tar.gz",
+      "sha256": "08e03dc5ca1e64f6fd73b5a52cf0eb72727f203a15fe3bf86f79526d25ae00a9",
+      "dir": "llama-b11081-linux-x64-cuda-dsjobs",
+      "llama_commit": "161755f29e415e2c33efe906e91843c068efd664",
+      "cuda": "12.8",
+      "archs": "80;86",
+      "built_at": "20261007T165909Z",
+      "code_rev": "f322ed06"
+    }
+  }
+}

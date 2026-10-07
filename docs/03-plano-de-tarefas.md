@@ -20,7 +20,7 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 54 de 78 tarefas concluídas (69%), 2 em andamento.
+**Andamento em 2026-10-07:** 57 de 78 tarefas concluídas (73%), 3 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
@@ -31,11 +31,11 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F4 — Contrato JEV e adaptadores | 16 | 0 | 0 |
 | F5 — Controle de execução | 3 | 0 | 0 |
 | F6 — Piloto | 4 | 0 | 0 |
-| F7 — Desenvolvimento e calibração | 0 | 0 | 4 |
+| F7 — Desenvolvimento e calibração | 3 | 1 | 0 |
 | F8 — Teste final | 0 | 0 | 4 |
 | F9 — Métricas e análise | 0 | 0 | 8 |
 | F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **54** | **2** | **22** |
+| **Total** | **57** | **3** | **18** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -183,19 +183,24 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 
 ## F7 — Desenvolvimento e calibração
 
-- [ ] **59.** Executar os candidatos no conjunto de desenvolvimento, sem calibração adicional.
-- [ ] **60.** Escolher os limites de confiança e as regras de abstenção só com a partição de calibração.
+- [~] **59.** Executar os candidatos no conjunto de desenvolvimento, sem calibração adicional.
+- [x] **60.** Escolher os limites de confiança e as regras de abstenção só com a partição de calibração.
   - ↳ Abster-se significa encaminhar para desambiguação. A regra é escolhida por meta de cobertura ou de risco, definida antes. *(Q5)*
-- [ ] **61.** Calibrar as probabilidades separadamente por candidato, quando aplicável. *(Q10)*
-- [ ] **62.** Não alterar prompts, opções, pesos ou limiares depois da abertura do conjunto de teste final.
+  - ↳ `analysis/calibrate.py` → `config/calibration.json`: menor limiar com rota errada com confiança alta ≤ 2%. Cobertura na calibração: SemIf 59,5%, Rizzo Flow 47,6%, GLiNER 11,8%, Laya 5,1% (nenhum atinge os 80% do critério H2).
+- [x] **61.** Calibrar as probabilidades separadamente por candidato, quando aplicável. *(Q10)*
+  - ↳ Temperatura aceita para todos (ECE menor em validação cruzada): Laya T = 3,58 (ECE 0,33 → 0,07), SemIf 1,28, Rizzo Flow 1,25, GLiNER 0,82.
+- [x] **62.** Não alterar prompts, opções, pesos ou limiares depois da abertura do conjunto de teste final.
   - ↳ Marco de congelamento: registrar os hashes da configuração, dos calibradores e dos adaptadores.
+  - ↳ `config/frozen.json` (tag `congelamento-d1-v1`): 15 arquivos e os 5 ambientes publicados. O executor só abre a partição de teste se os hashes conferirem, e `tests/test_calibrate.py` falha se algo congelado mudar.
 
 ## F8 — Teste final
 
 - [ ] **63.** Executar uma rodada de acurácia no teste final com lote 1.
 - [ ] **64.** Executar uma rodada de acurácia no teste final com o lote de produção definido. *(Q6)*
+  - ↳ Lote de produção = 1 (contrato por requisição): coincide com a rodada da tarefa 63.
 - [ ] **65.** Executar uma rodada de várias decisões sobre o mesmo texto, quando esse padrão existir no caso de uso.
   - ↳ Corresponde a D4 e a combinações por turno (por exemplo, D2 + D1). Medir a latência somada por turno.
+  - ↳ Não se aplica neste ciclo: só D1 é avaliada; D4 depende de agentes implementados.
 - [ ] **66.** Repetir cada medição de desempenho depois do aquecimento, em pelo menos três execuções independentes.
 
 ## F9 — Métricas e análise

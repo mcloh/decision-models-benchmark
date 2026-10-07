@@ -163,6 +163,7 @@ def main():
         "candidate": adapter.describe(), "precision": model_precision(adapter), "device": args.device,
         "split": args.split, "examples": len(rows), "seed": args.seed, "warmup": args.warmup,
         "batch_size": 1, "state_budget_tokens": args.state_budget, **guard,
+        "repetition": int(os.environ.get("DMB_REP", "1")),
         "load_seconds": round(load_s, 2),
         "warmup_latency_ms": [round(r["latency_ms"], 1) for r in rows if r["warmup"]],
         "latency_ms": latency_summary([r["latency_ms"] for r in measured if r.get("pred") is not None]),

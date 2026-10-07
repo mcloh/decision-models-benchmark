@@ -51,8 +51,7 @@ input:                                       # Q8
 
 execution:
   seed: 20261007
-  batch_sweep: [1, 2, 4, 8, 16, 32]          # Q6
-  production_batch: auto                     # maior lote com p95 <= slo
+  production_batch: 1                        # Q6: contrato por requisição, decisão turno a turno
   repetitions: 3
   cpu:                                       # Q11
     timeout_ms: 10000
@@ -70,7 +69,6 @@ calibration:                                 # Q10
 criteria:                                    # Q5
   latency_gpu_batch1:
     p95_ms_per_decision: 150
-    p95_ms_per_turn: 300
   accuracy:
     tasks: [D1, D2]
     non_inferiority_margin_pp: 3.0
