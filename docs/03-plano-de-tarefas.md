@@ -216,7 +216,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 ## F10 — Relatório e encerramento
 
 - [ ] **75.** Elaborar o relatório técnico com configuração, limitações, resultados e recomendação.
-  - ↳ Ao final, reestruturar o `README.md`: (1) apresentação executiva do benchmark, (2) resultados em formato executivo, (3) método, (4) detalhes do plano, estrutura e documentos.
+  - ↳ Ao final, reestruturar o `README.md`: (1) apresentação executiva do benchmark, (2) resultados em formato executivo com charts, (3) método, (4) detalhes do plano, estrutura e documentos.
 - [ ] **76.** Anexar ao relatório os manifestos de artefatos, hashes, configurações, logs, testes de conformidade e comandos de reprodução.
 - [ ] **77.** Arquivar os conjuntos congelados e os resultados no Object Storage com retenção definida.
 - [ ] **78.** Desligar notebooks, jobs, endpoints temporários e o NAT Gateway que não sejam mais necessários.
