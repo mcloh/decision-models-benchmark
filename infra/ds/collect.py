@@ -43,6 +43,8 @@ def main():
             s = json.loads(c.get_object(ns, bucket, n).data.content)
             if args.examples and s["examples"] != args.examples:
                 continue
+            if s.get("operational_env"):  # execuções exploratórias com parâmetros alterados ficam de fora
+                continue
             key = (s["candidate"]["name"], s["device"])
             run_id = n.split("/")[1]
             if key not in latest or run_id > latest[key][0]:

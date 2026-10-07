@@ -1,0 +1,56 @@
+{
+  "candidate": {
+    "name": "semif",
+    "model_id": "semif@851bf6e806ef",
+    "revision": "851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a",
+    "adapter_version": "0.1.0",
+    "device": "cpu",
+    "context_limit": 8192,
+    "probabilities_source": "native"
+  },
+  "precision": "bfloat16",
+  "device": "cpu",
+  "split": "dev",
+  "examples": 50,
+  "seed": 20261007,
+  "warmup": 5,
+  "batch_size": 1,
+  "state_budget_tokens": 512,
+  "process_guard": "ok",
+  "load_seconds": 6.27,
+  "warmup_latency_ms": [
+    32460.9,
+    28606.1,
+    22025.6,
+    20641.6,
+    30299.5
+  ],
+  "latency_ms": {
+    "n": 45,
+    "p50": 30633.44516099983,
+    "p95": 47585.681381199945,
+    "p99": 49343.981749680024,
+    "mean": 33482.62709695556
+  },
+  "errors": {},
+  "truncated": 0,
+  "state_tokens_max": 89,
+  "rss_peak_mib": 9136.75,
+  "quality": {
+    "n": 50,
+    "errors": 0,
+    "accuracy": 0.92,
+    "macro_f1": 0.9392857142857143,
+    "macro_precision": 0.9404761904761905,
+    "macro_recall": 0.9464285714285714
+  },
+  "calibration_raw": {
+    "brier": 0.1605347137797607,
+    "nll": 0.3247898203379594,
+    "ece": 0.0786511705708897
+  },
+  "oci": {
+    "region": "us-chicago-1",
+    "run_id": "20261007T174231Z-semif-evaluate"
+  }
+}

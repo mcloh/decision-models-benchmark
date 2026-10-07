@@ -20,7 +20,7 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 47 de 78 tarefas concluídas (60%), 2 em andamento.
+**Andamento em 2026-10-07:** 54 de 78 tarefas concluídas (69%), 2 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
@@ -29,13 +29,13 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F2 — Tarefas de decisão e taxonomia | 4 | 0 | 0 |
 | F3 — Dados e anotação | 12 | 0 | 0 |
 | F4 — Contrato JEV e adaptadores | 16 | 0 | 0 |
-| F5 — Controle de execução | 0 | 0 | 3 |
-| F6 — Piloto | 0 | 0 | 4 |
+| F5 — Controle de execução | 3 | 0 | 0 |
+| F6 — Piloto | 4 | 0 | 0 |
 | F7 — Desenvolvimento e calibração | 0 | 0 | 4 |
 | F8 — Teste final | 0 | 0 | 4 |
 | F9 — Métricas e análise | 0 | 0 | 8 |
 | F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **47** | **2** | **29** |
+| **Total** | **54** | **2** | **22** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -161,19 +161,25 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 
 ## F5 — Controle de execução
 
-- [ ] **52.** Fixar seeds, ordem dos exemplos, tamanho de lote, precisão numérica e limites de tokens de cada execução.
-- [ ] **53.** Definir uma política de truncamento comum para textos maiores que o menor contexto efetivamente suportado. *(Q8)*
+- [x] **52.** Fixar seeds, ordem dos exemplos, tamanho de lote, precisão numérica e limites de tokens de cada execução.
+  - ↳ `harness/evaluate.py`: seed 20261007, ordem fixa, lote 1, precisão nativa registrada por execução (fp32 Laya/GLiNER, bf16 SemIf, Q8_0 Rizzo), orçamento de estado de 512 tokens.
+- [x] **53.** Definir uma política de truncamento comum para textos maiores que o menor contexto efetivamente suportado. *(Q8)*
   - ↳ Truncar primeiro os turnos mais antigos do `state`. O enunciado atual nunca é truncado.
-- [ ] **54.** Registrar o número de tokens de cada entrada antes de executar os modelos.
+  - ↳ `dmb.canonical.fit_state`. Em D1 nenhum exemplo chega perto do orçamento (máximo abaixo de 120 tokens).
+- [x] **54.** Registrar o número de tokens de cada entrada antes de executar os modelos.
+  - ↳ `state_tokens` (tokenizador do candidato) e `input_tokens` (uso real) em cada predição.
 
 ## F6 — Piloto
 
-- [ ] **55.** Executar um piloto de 50 exemplos por candidato em CPU.
+- [x] **55.** Executar um piloto de 50 exemplos por candidato em CPU.
   - ↳ CPU: `VM.Standard.E4.Flex`, 8 OCPU, us-chicago-1, sub-rede privada. *(Q11)*
-- [ ] **56.** Executar um piloto de 50 exemplos por candidato em GPU.
+  - ↳ Pela regra de viabilidade, Rizzo Flow (p95 18,7 s) e SemIf (p95 47,6 s) ficam `inviavel_cpu`; as rodadas finais em CPU incluem Laya e GLiNER. Resultados em [`reports/pilot/`](../reports/pilot/README.md).
+- [x] **56.** Executar um piloto de 50 exemplos por candidato em GPU.
   - ↳ GPU: `VM.GPU.A10.1`, sa-saopaulo-1, execuções em fila. *(Q14)*
-- [ ] **57.** Medir memória de GPU, memória RAM, tempo de carga, tempo de aquecimento e falhas do piloto.
-- [ ] **58.** Ajustar apenas os parâmetros operacionais necessários para eliminar falhas de execução.
+- [x] **57.** Medir memória de GPU, memória RAM, tempo de carga, tempo de aquecimento e falhas do piloto.
+  - ↳ Sem erros nem truncamentos. Carga de 4 a 21 s; pico de GPU de 1,7 GB (GLiNER) a 8,5 GB (SemIf).
+- [x] **58.** Ajustar apenas os parâmetros operacionais necessários para eliminar falhas de execução.
+  - ↳ Nenhum ajuste necessário. O orçamento interno de cabeçalho do Laya (`head_max_len`) foi verificado pelos diagnósticos de opções colapsadas (zero ocorrências) e mantido no padrão do checkpoint.
 
 ## F7 — Desenvolvimento e calibração
 
