@@ -20,11 +20,11 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 70 de 78 tarefas concluídas (89%), 2 em andamento.
+**Andamento em 2026-10-07:** 75 de 78 tarefas concluídas (96%), 1 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
-| F0 — Infraestrutura OCI | 6 | 2 | 2 |
+| F0 — Infraestrutura OCI | 7 | 1 | 2 |
 | F1 — Ambiente e artefatos | 9 | 0 | 0 |
 | F2 — Tarefas de decisão e taxonomia | 4 | 0 | 0 |
 | F3 — Dados e anotação | 12 | 0 | 0 |
@@ -34,8 +34,8 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F7 — Desenvolvimento e calibração | 4 | 0 | 0 |
 | F8 — Teste final | 4 | 0 | 0 |
 | F9 — Métricas e análise | 8 | 0 | 0 |
-| F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **70** | **2** | **6** |
+| F10 — Relatório e encerramento | 4 | 0 | 0 |
+| **Total** | **75** | **1** | **2** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -54,8 +54,8 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
   - ↳ Não se aplica neste ciclo (depende da tarefa 3).
 - [x] **5.** Criar um projeto no OCI Data Science.
   - ↳ `benchmark-decisoes-ptbr`.
-- [~] **6.** Criar buckets no Object Storage para `entrada`, `artefatos`, `resultados` e `logs-imutaveis`.
-  - ↳ Buckets `dmb-*`, privados e com versionamento. A regra de retenção de `dmb-logs-imutaveis` é definida com a política de arquivamento (tarefa 77).
+- [x] **6.** Criar buckets no Object Storage para `entrada`, `artefatos`, `resultados` e `logs-imutaveis`.
+  - ↳ Buckets `dmb-*`, privados e com versionamento. `dmb-logs-imutaveis` usa regra de retenção de 365 dias (tarefa 77).
 - [x] **7.** Definir políticas IAM de menor privilégio para leitura dos dados, escrita dos resultados e execução dos jobs.
   - ↳ Políticas no escopo do compartment, sem grupos nem dynamic groups, com principais identificados por condição.
   - ↳ `dmb-usuario-manager`: o usuário (filtrado por `request.user.id`) é *manager* das famílias data-science, object, virtual-network, logging, repos e generative-ai.
@@ -226,8 +226,11 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 
 ## F10 — Relatório e encerramento
 
-- [ ] **75.** Elaborar o relatório técnico com configuração, limitações, resultados e recomendação.
+- [x] **75.** Elaborar o relatório técnico com configuração, limitações, resultados e recomendação.
+  - ↳ [`README.md`](../README.md) (apresentação, resultados, recomendação, método e detalhes) e os relatórios por etapa em [`reports/`](../reports/).
   - ↳ Ao final, reestruturar o `README.md`: (1) apresentação executiva do benchmark, (2) resultados em formato executivo com charts, (3) método, (4) plano, estrutura e documentos, (5) conclusão.
-- [ ] **76.** Anexar ao relatório os manifestos de artefatos, hashes, configurações, logs, testes de conformidade e comandos de reprodução.
-- [ ] **77.** Arquivar os conjuntos congelados e os resultados no Object Storage com retenção definida.
-- [ ] **78.** Desligar notebooks, jobs, endpoints temporários e o NAT Gateway que não sejam mais necessários.
+- [x] **76.** Anexar ao relatório os manifestos de artefatos, hashes, configurações, logs, testes de conformidade e comandos de reprodução.
+- [x] **77.** Arquivar os conjuntos congelados e os resultados no Object Storage com retenção definida.
+  - ↳ Pacote com relatórios, configuração, partições, taxonomia, manifesto, contrato e documentação em `dmb-logs-imutaveis/archive/d1-v1/` (SHA-256 `c3600792…8c1e`), com regra de retenção de 365 dias. Execuções individuais em `dmb-resultados` e `dmb-resultados-gru`.
+- [x] **78.** Desligar notebooks, jobs, endpoints temporários e o NAT Gateway que não sejam mais necessários.
+  - ↳ Notebook desativado (reversível), nenhum job ativo, nenhum NAT criado e nenhum endpoint exposto (os adaptadores rodam dentro dos jobs). A VM de trabalho e os buckets permanecem para consulta e para os próximos ciclos.
