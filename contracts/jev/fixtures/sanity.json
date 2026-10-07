@@ -1,0 +1,125 @@
+{
+  "contract": "jev-compat-v1",
+  "options": {
+    "pagamento": "Pagar uma conta ou consultar um pagamento",
+    "cancelamento": "Cancelar um serviço contratado",
+    "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+    "sem_correspondencia": "Nenhuma das opções anteriores"
+  },
+  "cases": [
+    {
+      "name": "choice:pagamento",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: quero pagar a conta deste mês",
+      "question": {
+        "type": "choice",
+        "instructions": "Qual intenção o usuário expressa na Mensagem?",
+        "criteria": {
+          "pagamento": "Pagar uma conta ou consultar um pagamento",
+          "cancelamento": "Cancelar um serviço contratado",
+          "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+          "sem_correspondencia": "Nenhuma das opções anteriores"
+        }
+      },
+      "gold": "pagamento"
+    },
+    {
+      "name": "choice:cancelamento",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: preciso cancelar o meu serviço hoje",
+      "question": {
+        "type": "choice",
+        "instructions": "Qual intenção o usuário expressa na Mensagem?",
+        "criteria": {
+          "pagamento": "Pagar uma conta ou consultar um pagamento",
+          "cancelamento": "Cancelar um serviço contratado",
+          "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+          "sem_correspondencia": "Nenhuma das opções anteriores"
+        }
+      },
+      "gold": "cancelamento"
+    },
+    {
+      "name": "choice:suporte_tecnico",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: o aplicativo trava toda vez que abro",
+      "question": {
+        "type": "choice",
+        "instructions": "Qual intenção o usuário expressa na Mensagem?",
+        "criteria": {
+          "pagamento": "Pagar uma conta ou consultar um pagamento",
+          "cancelamento": "Cancelar um serviço contratado",
+          "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+          "sem_correspondencia": "Nenhuma das opções anteriores"
+        }
+      },
+      "gold": "suporte_tecnico"
+    },
+    {
+      "name": "choice:sem_correspondencia",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: qual a previsão do tempo para amanhã?",
+      "question": {
+        "type": "choice",
+        "instructions": "Qual intenção o usuário expressa na Mensagem?",
+        "criteria": {
+          "pagamento": "Pagar uma conta ou consultar um pagamento",
+          "cancelamento": "Cancelar um serviço contratado",
+          "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+          "sem_correspondencia": "Nenhuma das opções anteriores"
+        }
+      },
+      "gold": "sem_correspondencia"
+    },
+    {
+      "name": "noul:clara",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: quero cancelar o serviço de internet agora",
+      "question": {
+        "type": "noul",
+        "instructions": "A Mensagem tem informação suficiente para rotear sem perguntar ao usuário?",
+        "criteria": {
+          "true": "Sim, a intenção está clara",
+          "false": "Não, é preciso perguntar ao usuário"
+        }
+      },
+      "gold": "true"
+    },
+    {
+      "name": "noul:vaga",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: oi",
+      "question": {
+        "type": "noul",
+        "instructions": "A Mensagem tem informação suficiente para rotear sem perguntar ao usuário?",
+        "criteria": {
+          "true": "Sim, a intenção está clara",
+          "false": "Não, é preciso perguntar ao usuário"
+        }
+      },
+      "gold": "false"
+    },
+    {
+      "name": "score:alta",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: URGENTE!!! estou sem serviço há três dias e preciso resolver agora",
+      "question": {
+        "type": "score",
+        "instructions": "Qual a urgência da Mensagem?",
+        "criteria": [
+          "Baixa",
+          "Média",
+          "Alta"
+        ]
+      },
+      "gold": "2"
+    },
+    {
+      "name": "score:baixa",
+      "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: quando puder, gostaria de saber se existe algum plano novo",
+      "question": {
+        "type": "score",
+        "instructions": "Qual a urgência da Mensagem?",
+        "criteria": [
+          "Baixa",
+          "Média",
+          "Alta"
+        ]
+      },
+      "gold": "0"
+    }
+  ]
+}

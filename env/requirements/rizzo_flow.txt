@@ -1,0 +1,2 @@
+# Sem torch: o Rizzo Flow roda sobre o llama.cpp b11081 (runtimes copiados para a imagem).
+jinja2==3.1.6

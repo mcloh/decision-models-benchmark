@@ -1,0 +1,203 @@
+{
+  "contract": "jev-compat-v1",
+  "cases": [
+    {
+      "name": "valid_choice_noul",
+      "expect": "ok",
+      "request": {
+        "model": "any",
+        "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: quero cancelar o serviço",
+        "questions": {
+          "D1": {
+            "type": "choice",
+            "instructions": "Qual intenção o usuário expressa na Mensagem?",
+            "criteria": {
+              "pagamento": "Pagar uma conta ou consultar um pagamento",
+              "cancelamento": "Cancelar um serviço contratado",
+              "suporte_tecnico": "Resolver um problema técnico ou falha de funcionamento",
+              "sem_correspondencia": "Nenhuma das opções anteriores"
+            }
+          },
+          "D3": {
+            "type": "noul",
+            "instructions": "A Mensagem tem informação suficiente para rotear sem perguntar ao usuário?",
+            "criteria": {
+              "true": "Sim, a intenção está clara",
+              "false": "Não, é preciso perguntar ao usuário"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "valid_score",
+      "expect": "ok",
+      "request": {
+        "model": "any",
+        "state": "Contexto:\nAgente ativo: nenhum\nSessões suspensas: nenhuma\n\nMensagem: isso é muito urgente, preciso agora",
+        "questions": {
+          "urgencia": {
+            "type": "score",
+            "instructions": "Qual a urgência da Mensagem?",
+            "criteria": [
+              "Baixa",
+              "Média",
+              "Alta"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "name": "valid_state_object",
+      "expect": "ok",
+      "request": {
+        "model": "any",
+        "state": {
+          "mensagem": "oi"
+        },
+        "questions": {
+          "D3": {
+            "type": "noul",
+            "instructions": "A Mensagem é uma saudação?",
+            "criteria": {
+              "true": "Sim, a intenção está clara",
+              "false": "Não, é preciso perguntar ao usuário"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_17_options",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "questions": {
+          "q": {
+            "type": "choice",
+            "instructions": "?",
+            "criteria": {
+              "o0": "opção 0",
+              "o1": "opção 1",
+              "o2": "opção 2",
+              "o3": "opção 3",
+              "o4": "opção 4",
+              "o5": "opção 5",
+              "o6": "opção 6",
+              "o7": "opção 7",
+              "o8": "opção 8",
+              "o9": "opção 9",
+              "o10": "opção 10",
+              "o11": "opção 11",
+              "o12": "opção 12",
+              "o13": "opção 13",
+              "o14": "opção 14",
+              "o15": "opção 15",
+              "o16": "opção 16"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_single_option",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "questions": {
+          "q": {
+            "type": "choice",
+            "instructions": "?",
+            "criteria": {
+              "a": "A"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_noul_missing_false",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "questions": {
+          "q": {
+            "type": "noul",
+            "instructions": "?",
+            "criteria": {
+              "true": "sim"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_unknown_type",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "questions": {
+          "q": {
+            "type": "rank",
+            "instructions": "?",
+            "criteria": {
+              "a": "A",
+              "b": "B"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_empty_state",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "",
+        "questions": {
+          "q": {
+            "type": "noul",
+            "instructions": "?",
+            "criteria": {
+              "true": "Sim, a intenção está clara",
+              "false": "Não, é preciso perguntar ao usuário"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "invalid_no_questions",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "questions": {}
+      }
+    },
+    {
+      "name": "invalid_extra_field",
+      "expect": "invalid_request",
+      "request": {
+        "model": "any",
+        "state": "x",
+        "stream": true,
+        "questions": {
+          "q": {
+            "type": "noul",
+            "instructions": "?",
+            "criteria": {
+              "true": "Sim, a intenção está clara",
+              "false": "Não, é preciso perguntar ao usuário"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

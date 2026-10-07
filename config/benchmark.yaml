@@ -5,7 +5,7 @@
 contract:
   version: jev-compat-v1                     # Q1
   endpoint: /v1/systemone
-  max_options: 20                            # Q2: inclui sem_correspondencia
+  max_options: 16                            # Q2: inclui sem_correspondencia; limite do SemIf (A–P)
   fallback_option: sem_correspondencia
   require_zero_output_tokens: true
 

@@ -1,0 +1,14 @@
+*
+!pyproject.toml
+!dmb/
+!adapters/
+!harness/
+!contracts/
+!config/
+!env/requirements/
+!env/artifacts-manifest.json
+!models/src/*.tar.gz
+!models/runtimes/llama-b11081-linux-x64-cpu/
+!models/runtimes/llama-b11081-linux-x64-cuda/
+**/__pycache__
+!infra/oci/session.py

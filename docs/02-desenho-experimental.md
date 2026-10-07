@@ -1,5 +1,7 @@
 # 02 — Desenho experimental
 
+> **Escopo do primeiro ciclo (revisão de 2026-10-07).** Não há agentes implementados. Por isso o ciclo avalia só a **classificação de intenções (D1)** no domínio de **atendimento de telefonia móvel**, com a taxonomia `data/taxonomy/intents-v1.yaml` (42 intenções em 13 domínios). Pedidos fora de escopo, enunciados emocionais e casos com várias intenções entram como exemplos de D1, com rótulo `sem_correspondencia` ou a intenção principal. D2 a D5 ficam descritas abaixo para os próximos ciclos. Os dados são **100% sintéticos** e a anotação é feita por **três modelos generativos** (ver §4).
+
 ## 1. Hipóteses
 
 - **H1 (acurácia).** Pelo menos um candidato atinge, em PT-BR, uma acurácia de roteamento (D1/D2) compatível com o uso no orquestrador. O critério é a não inferioridade em relação ao baseline LLM (margem de 3 p.p.); ver [04, Q5](04-questoes-em-aberto.md#q5--critérios-de-sucesso-pré-registrados).
@@ -8,12 +10,12 @@
 
 ## 2. Tarefas de decisão
 
-Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão** (tarefa 21). No primeiro ciclo, cada questão tem **no máximo 20 opções**, incluindo `sem_correspondencia` (tarefas 22–23).
+Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão** (tarefa 21). No primeiro ciclo, cada questão tem **no máximo 16 opções**, incluindo `sem_correspondencia` (tarefas 22–23; limite do SemIf, ver Q2).
 
 ### D1 — Classificação de intenção
 
 - **Pergunta:** "Qual intenção do usuário este enunciado expressa?"
-- **Opções:** as intenções elegíveis do exemplo, de 2 a 19, mais `sem_correspondencia`. Cada opção tem uma descrição curta, do mesmo jeito que viria do catálogo de agentes ou intenções.
+- **Opções:** as intenções elegíveis do exemplo, de 1 a 15, mais `sem_correspondencia`. Cada opção tem uma descrição curta, do mesmo jeito que viria do catálogo de agentes ou intenções.
 - **Regra:** escolher a intenção principal que o próximo agente precisa atender. Se nenhuma se aplica, escolher `sem_correspondencia`.
 
 ### D2 — Continuidade de sessão
@@ -82,6 +84,18 @@ Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão
 **Serialização do estado.** Alguns candidatos aceitam só texto, e não `state` estruturado. Por isso, uma **única regra de serialização** de `state` + `utterance` em texto vale para todos os adaptadores (um bloco "Contexto:" com o agente ativo, as sessões suspensas e os N últimos turnos, seguido de "Mensagem:"; N calculado como em [04, Q8](04-questoes-em-aberto.md#q8--turnos-no-state-e-orçamento-de-tokens)). A regra é versionada junto com a política de truncamento (tarefa 53). Um adaptador não pode usar informação de `state` que não esteja nessa serialização.
 
 ## 4. Dados
+
+**Primeiro ciclo: pipeline sintético (`datagen/`), executado na VM.**
+
+| Etapa | Implementação | Tarefas |
+|-------|---------------|---------|
+| Geração | `datagen.generate`: 42 intenções × 7 perfis + 5 categorias fora de escopo × 9 lotes; 12 enunciados por lote. Geradores alternados `meta.llama-4-maverick` e `cohere.command-a` (fornecedores distintos dos anotadores). Perfis: curto/neutro, informal/abreviado, erros de digitação, regionalismo, emocional, longo com contexto, indireto ou com várias intenções | 24, 27 |
+| Preparação | `datagen.prepare`: mascaramento de dados pessoais (CPF, CNPJ, cartão, telefone, e-mail, CEP), deduplicação exata e aproximada (Jaccard ≥ 0,85 em 5-gramas), limites de comprimento | 25, 28 |
+| Anotação | `datagen.annotate`: três modelos (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`) em rodízio por lote; dois anotam de forma independente, sem ver o rótulo de geração, e o terceiro desempata. Três rótulos distintos → exemplo excluído. Instruções: [06-guia-de-anotacao.md](06-guia-de-anotacao.md) | 29–32 |
+| Montagem | `datagen.build`: partição por lote de geração (3/2/2 lotes por intenção para teste/calibração/dev), conjuntos de 4, 8, 12 ou 16 opções simulando a elegibilidade (10% sem a intenção correta → `sem_correspondencia`), lint e congelamento com SHA-256 em `dmb-entrada` e `dmb-logs-imutaveis` | 33–36 |
+
+Itens abaixo descrevem o desenho geral (válido também para dados reais em ciclos futuros).
+
 
 - **Unidade de amostragem:** conversa (`group_id`). Cada turno anotado gera um ou mais exemplos (um por tarefa de decisão).
 - **Fontes:** enunciados representativos do domínio de destino, anonimizados (tarefas 24–25). Se houver dados sintéticos, eles ficam identificados em `metadata` e são reportados em separado.

@@ -1,0 +1,155 @@
+# Taxonomia de intenções — atendimento de telefonia móvel (genérica, sem marcas).
+# Tarefa D1: classificar o enunciado do usuário numa intenção. Não há agentes implementados;
+# cada intenção corresponderia a um agente ou fluxo de destino do orquestrador.
+# `confusable_with`: pares difíceis usados como distratores na montagem das opções.
+version: v1.0
+fallback:
+  id: sem_correspondencia
+  description: Nenhuma das opções anteriores; pedido fora do escopo do atendimento ou sem intenção identificável
+domains:
+  contas:
+    - id: conta_segunda_via
+      description: Obter segunda via da fatura, boleto, código de barras ou código PIX para pagamento
+    - id: conta_contestacao
+      description: Contestar valor ou cobrança considerada indevida na fatura e pedir estorno
+      confusable_with: [vas_cancelamento, roaming_cobranca, conta_explicacao]
+    - id: conta_explicacao
+      description: Entender os itens, valores ou aumento da fatura sem necessariamente contestar
+      confusable_with: [conta_contestacao, plano_consulta]
+    - id: conta_vencimento
+      description: Alterar a data de vencimento da fatura
+    - id: conta_debito_automatico_digital
+      description: Cadastrar ou cancelar débito automático ou fatura digital por e-mail ou aplicativo
+    - id: conta_pagamento_confirmacao
+      description: Confirmar se um pagamento foi reconhecido ou informar que já pagou a conta
+      confusable_with: [negociacao_religacao]
+  negociacao:
+    - id: negociacao_divida
+      description: Negociar ou parcelar débitos em atraso e obter acordo de pagamento
+      confusable_with: [conta_segunda_via, negociacao_religacao]
+    - id: negociacao_religacao
+      description: Reativar linha bloqueada ou suspensa por falta de pagamento
+      confusable_with: [conta_pagamento_confirmacao, suporte_sem_sinal]
+  recarga:
+    - id: recarga_realizar
+      description: Fazer uma recarga de créditos em linha pré-paga
+    - id: recarga_saldo
+      description: Consultar saldo, créditos ou validade da linha pré-paga
+      confusable_with: [internet_consumo]
+    - id: recarga_nao_creditada
+      description: Recarga paga que não caiu ou não foi creditada
+      confusable_with: [bonus_nao_recebido, conta_pagamento_confirmacao]
+  plano:
+    - id: plano_consulta
+      description: Informações sobre o plano atual, franquia, minutos e serviços incluídos
+      confusable_with: [beneficios_consulta, internet_consumo]
+    - id: plano_troca
+      description: Mudar de plano, fazer upgrade, downgrade ou migrar entre pré, controle e pós
+      confusable_with: [plano_nova_linha, desconto_retencao]
+    - id: plano_nova_linha
+      description: Contratar uma nova linha ou plano adicional, inclusive dependentes
+      confusable_with: [plano_troca]
+  internet:
+    - id: internet_pacote_adicional
+      description: Comprar pacote extra de internet móvel quando a franquia acaba
+      confusable_with: [roaming_pacote, bonus_nao_recebido]
+    - id: internet_consumo
+      description: Consultar quanto de internet já foi usado ou quanto resta da franquia
+      confusable_with: [recarga_saldo, plano_consulta]
+    - id: internet_problema_conexao
+      description: Internet móvel lenta, instável ou sem conexão de dados
+      confusable_with: [suporte_sem_sinal, suporte_configuracao]
+  servicos_adicionais:
+    - id: vas_cancelamento
+      description: Cancelar serviço de valor adicionado ou assinatura digital cobrada na conta ou no crédito
+      confusable_with: [conta_contestacao, cancelamento_linha]
+    - id: vas_contratacao
+      description: Assinar serviço adicional como streaming, música, jogos, armazenamento ou seguro
+      confusable_with: [beneficios_consulta, parceiros_ofertas]
+    - id: vas_consulta
+      description: Saber quais serviços adicionais ou assinaturas estão ativos na linha
+      confusable_with: [plano_consulta, vas_cancelamento]
+  beneficios_fidelidade:
+    - id: beneficios_consulta
+      description: Conhecer ou ativar benefícios e aplicativos inclusos no plano
+      confusable_with: [vas_contratacao, plano_consulta]
+    - id: desconto_retencao
+      description: Pedir desconto, redução de preço ou condição melhor para permanecer
+      confusable_with: [plano_troca, cancelamento_linha, negociacao_divida]
+    - id: fidelidade_pontos
+      description: Consultar saldo, extrato ou validade de pontos do programa de fidelidade
+      confusable_with: [recarga_saldo, fidelidade_resgate]
+    - id: fidelidade_resgate
+      description: Trocar pontos do programa de fidelidade por produtos, descontos ou aparelhos
+      confusable_with: [marketplace_compra, fidelidade_pontos]
+    - id: bonus_nao_recebido
+      description: Bônus de internet, minutos ou recarga prometido que não foi recebido ou ativado
+      confusable_with: [recarga_nao_creditada, internet_pacote_adicional]
+  marketplace:
+    - id: marketplace_compra
+      description: Comprar aparelho, acessório ou produto na loja online da operadora ou de parceiros
+      confusable_with: [fidelidade_resgate, plano_nova_linha]
+    - id: marketplace_pedido
+      description: Acompanhar entrega, troca, devolução ou status de pedido feito na loja
+      confusable_with: [marketplace_compra]
+    - id: parceiros_ofertas
+      description: Ofertas, cupons e vantagens de empresas parceiras
+      confusable_with: [beneficios_consulta, vas_contratacao]
+  suporte:
+    - id: suporte_sem_sinal
+      description: Sem sinal, sem serviço ou sem conseguir fazer ou receber ligações e SMS
+      confusable_with: [internet_problema_conexao, negociacao_religacao]
+    - id: suporte_configuracao
+      description: Configurar aparelho, APN, correio de voz, chamada Wi-Fi ou VoLTE
+      confusable_with: [internet_problema_conexao, suporte_chip_esim]
+    - id: suporte_chip_esim
+      description: Trocar chip, ativar eSIM, chip danificado ou novo aparelho sem reconhecer o chip
+      confusable_with: [suporte_configuracao, seguranca_perda_roubo]
+  seguranca:
+    - id: seguranca_perda_roubo
+      description: Bloquear linha ou aparelho por perda, furto ou roubo
+      confusable_with: [suporte_chip_esim, seguranca_fraude]
+    - id: seguranca_fraude
+      description: Suspeita de clonagem, golpe, linha usada sem autorização ou contratação não reconhecida
+      confusable_with: [conta_contestacao, seguranca_perda_roubo]
+  roaming:
+    - id: roaming_pacote
+      description: Ativar roaming internacional ou contratar pacote de viagem
+      confusable_with: [internet_pacote_adicional, roaming_duvida]
+    - id: roaming_duvida
+      description: Saber se o serviço funciona em outro país, tarifas e como usar em viagem
+      confusable_with: [roaming_pacote]
+    - id: roaming_cobranca
+      description: Contestar cobrança de uso no exterior ou roaming indevido
+      confusable_with: [conta_contestacao]
+  linha_cadastro:
+    - id: cadastro_atualizacao
+      description: Atualizar dados cadastrais, endereço, e-mail ou transferir titularidade
+    - id: portabilidade
+      description: Trazer o número de outra operadora ou levar o número para outra
+      confusable_with: [cancelamento_linha]
+    - id: cancelamento_linha
+      description: Cancelar a linha, o plano ou o contrato
+      confusable_with: [vas_cancelamento, portabilidade, desconto_retencao]
+    - id: troca_numero
+      description: Trocar o número da linha
+  atendimento:
+    - id: reclamacao_atendimento
+      description: Reclamar da qualidade do atendimento, de protocolo não resolvido ou pedir ouvidoria
+      confusable_with: [atendimento_humano]
+    - id: atendimento_humano
+      description: Pedir para falar com um atendente humano
+      confusable_with: [reclamacao_atendimento]
+
+# Enunciados fora de escopo (rótulo de referência: sem_correspondencia).
+out_of_scope:
+  - id: oos_fora_do_dominio
+    description: Pedido sem relação com telefonia (receitas, clima, esportes, trabalhos escolares, programação)
+  - id: oos_outra_empresa
+    description: Assunto de outra empresa ou serviço (banco, companhia aérea, delivery, governo)
+  - id: oos_conversa
+    description: Saudação isolada, agradecimento, conversa fiada ou teste do assistente sem pedido
+  - id: oos_desabafo
+    description: Desabafo emocional, ofensa ou xingamento sem pedido de atendimento identificável
+  - id: oos_ininteligivel
+    description: Texto ininteligível, aleatório ou incompleto demais para ter intenção

@@ -38,7 +38,7 @@
               "criteria": {
                 "type": "object",
                 "minProperties": 2,
-                "maxProperties": 20,
+                "maxProperties": 16,
                 "additionalProperties": {"type": "string", "minLength": 1}
               }
             }
@@ -67,7 +67,7 @@
               "criteria": {
                 "type": "array",
                 "minItems": 2,
-                "maxItems": 20,
+                "maxItems": 16,
                 "items": {"type": "string", "minLength": 1}
               }
             }

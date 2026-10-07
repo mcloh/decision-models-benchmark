@@ -45,39 +45,48 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 - [ ] **9.** Criar uma rota temporária de saída por NAT Gateway, só para a aquisição inicial de dependências e pesos.
   - ↳ Remover a rota logo após a tarefa 16 e passar pelo gate de egresso antes de qualquer execução. *(Q3)*
   - ↳ Criar e ativar **só quando necessário**, com `infra/oci/nat.py on`. Para desligar: `nat.py off`, que fecha a rota e bloqueia o NAT. Na tarefa 78: `nat.py off --delete`.
-- [ ] **10.** Validar que os jobs acessam os buckets sem internet pública.
-  - ↳ Adiado para quando o primeiro job existir (depois da tarefa 11).
+- [x] **10.** Validar que os jobs acessam os buckets sem internet pública.
+  - ↳ Validado em 2026-10-07 com jobs do Data Science em `dmb-subnet-jobs`. Os pesos do Rizzo (4,4 GB) desceram pela Service Gateway em 28 s, com SHA-256 conferido.
 
 ## F1 — Ambiente e artefatos
 
-- [ ] **11.** Criar uma imagem de contêiner base com Python, CUDA, PyTorch, Transformers, Hugging Face Hub e ferramentas de medição.
+- [x] **11.** Criar uma imagem de contêiner base com Python, CUDA, PyTorch, Transformers, Hugging Face Hub e ferramentas de medição.
   - ↳ Incluir um exportador OpenTelemetry, para que a telemetria do harness tenha o mesmo formato da observabilidade do orquestrador.
-- [ ] **12.** Fixar num manifesto as versões do sistema, dos drivers CUDA, do Python, das bibliotecas e da imagem de contêiner.
-- [ ] **13.** Baixar os pesos, tokenizadores, revisões e licenças aprovados de cada candidato. *(Q4)*
+  - ↳ **Substituído na prática por ambientes Python publicados no bucket** (`infra/ds/build_env.sh` → `dmb-artefatos/envs/<candidato>/`), porque os jobs do Data Science dispensam contêiner próprio. O CUDA vem das wheels `cu128` do PyTorch e o Python é o 3.11.9 base dos jobs.
+  - ↳ `env/Dockerfile` com `--build-arg CANDIDATE=...`: **uma imagem por candidato**, porque o SemIf exige `transformers==5.17.0` e o GLiNER exige `transformers<5`. Os pesos ficam fora da imagem. Falta fazer o build e o push para o OCIR, na VM.
+- [x] **12.** Fixar num manifesto as versões do sistema, dos drivers CUDA, do Python, das bibliotecas e da imagem de contêiner.
+- [x] **13.** Baixar os pesos, tokenizadores, revisões e licenças aprovados de cada candidato. *(Q4)*
+  - ↳ `env/acquire.py`: todas as licenças são Apache-2.0 ou MIT (incluindo o Qwen3.5-4B). Rizzo: GGUF Q8_0 (padrão do projeto) + llama.cpp b11081. **Não foi preciso NAT**: a aquisição rodou fora da VCN e enviou direto ao bucket.
   - ↳ A aquisição falha se a licença estiver fora da allowlist de `config/benchmark.yaml`. O contexto efetivo de cada candidato é medido e registrado.
   - ↳ Incluir as dependências específicas de cada candidato (pacote GLiNER, runtime SemIf, interface Rizzo Flow) e a revisão fixada de `Qwen/Qwen3.5-4B`.
-- [ ] **14.** Calcular o SHA-256 de cada artefato baixado.
-- [ ] **15.** Copiar os pesos e dependências aprovados para o bucket `artefatos`.
-- [ ] **16.** Registrar no manifesto a origem, a revisão, a licença, o hash, a data de aquisição e o tamanho de cada artefato.
-- [ ] **17.** Desabilitar a saída pública dos jobs de benchmark.
-- [ ] **18.** Carregar cada candidato só a partir dos artefatos locais.
+- [x] **14.** Calcular o SHA-256 de cada artefato baixado.
+- [x] **15.** Copiar os pesos e dependências aprovados para o bucket `artefatos`.
+- [x] **16.** Registrar no manifesto a origem, a revisão, a licença, o hash, a data de aquisição e o tamanho de cada artefato.
+- [x] **17.** Desabilitar a saída pública dos jobs de benchmark.
+  - ↳ O gate de egresso foi aprovado nas execuções em sub-rede privada: huggingface.co, pypi.org e github.com ficaram inacessíveis.
+- [x] **18.** Carregar cada candidato só a partir dos artefatos locais.
   - ↳ Usar `HF_HUB_OFFLINE=1`, `TRANSFORMERS_OFFLINE=1` e um cache apontado para os artefatos verificados.
-- [ ] **19.** Fazer o job falhar se algum candidato tentar baixar arquivos durante a inferência.
+  - ↳ `harness/job.py` baixa do bucket só o que está no manifesto e confere o SHA-256. Os quatro candidatos já carregaram offline, a partir dos artefatos locais.
+- [x] **19.** Fazer o job falhar se algum candidato tentar baixar arquivos durante a inferência.
   - ↳ Duas camadas: as variáveis de ambiente offline e o bloqueio de rede da VCN. Um teste negativo prova que a falha ocorre.
+  - ↳ Camada de aplicação em `dmb/offline.py` (bloqueia conexões fora do loopback), com teste em `tests/test_offline.py`. O gate de egresso de `harness/job.py` cobre a camada de rede.
 
 ## F2 — Tarefas de decisão e taxonomia
 
-- [ ] **20.** Definir a taxonomia de decisões a avaliar em PT-BR.
+- [x] **20.** Definir a taxonomia de decisões a avaliar em PT-BR.
+  - ↳ **Primeiro ciclo: só D1 (classificação de intenções), atendimento de telefonia móvel.** `data/taxonomy/intents-v1.yaml`: 42 intenções em 13 domínios + 5 categorias fora de escopo.
   - ↳ Taxonomia de **intenções** (D1), ligadas aos **agentes de destino** do catálogo A2A, mais as decisões de **continuidade de sessão** (D2), **desambiguação** (D3) e **várias intenções** (D4). D5 é opcional. Ver [02 §2](02-desenho-experimental.md#2-tarefas-de-decisão).
-- [ ] **21.** Escrever a pergunta, as opções, as descrições das opções e a regra de decisão de cada tarefa.
+- [x] **21.** Escrever a pergunta, as opções, as descrições das opções e a regra de decisão de cada tarefa.
   - ↳ As descrições das opções seguem o estilo de um *agent card*: curtas e orientadas à capacidade do agente.
-- [ ] **22.** Limitar o primeiro ciclo a no máximo 20 opções por questão, para garantir compatibilidade com o Laya. *(Q2)*
+- [x] **22.** Limitar o primeiro ciclo a no máximo 20 opções por questão, para garantir compatibilidade com o Laya. *(Q2)*
   - ↳ Os subconjuntos de opções por exemplo simulam o serviço de elegibilidade de intenções.
-- [ ] **23.** Incluir uma opção explícita de `outro` ou `sem correspondência` quando a taxonomia não for exaustiva.
+  - ↳ **Limite efetivo: 16 opções**, por causa do SemIf (Q2).
+- [x] **23.** Incluir uma opção explícita de `outro` ou `sem correspondência` quando a taxonomia não for exaustiva.
 
 ## F3 — Dados e anotação
 
-- [ ] **24.** Coletar textos PT-BR representativos do domínio de destino. *(Q7)*
+- [ ] **24.** Coletar textos PT-BR representativos do domínio de destino. *(Q7, Q15)*
+  - ↳ **100% sintéticos** (`datagen.generate`, na VM).
   - ↳ A unidade é a **conversa com vários turnos**, não o enunciado isolado. Cada turno guarda o estado (agente ativo e sessões suspensas).
 - [ ] **25.** Remover ou mascarar dados pessoais, segredos e identificadores que o benchmark não precisa.
 - [ ] **26.** Separar os textos por domínio, comprimento, grau de ambiguidade e classe esperada.
@@ -85,9 +94,11 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 - [ ] **27.** Criar exemplos adversariais com abreviações, erros de ortografia, regionalismos, textos curtos e várias intenções.
   - ↳ Acrescentar respostas curtas que dependem do contexto ("sim", "o segundo"), troca de assunto, retorno a um assunto anterior e pedidos fora de escopo.
 - [ ] **28.** Definir os critérios de inclusão e exclusão dos exemplos.
-- [ ] **29.** Produzir o guia de anotação humana.
+- [x] **29.** Produzir o guia de anotação humana.
+  - ↳ [06-guia-de-anotacao.md](06-guia-de-anotacao.md), usado literalmente pelos anotadores.
   - ↳ O guia cobre D1–D4 com exemplos-limite (por exemplo, quando um enunciado curto continua a tarefa do agente ativo e quando inicia um novo agente).
 - [ ] **30.** Anotar cada exemplo com dois avaliadores independentes.
+  - ↳ Avaliadores = modelos generativos em rodízio (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`). *(Q15)*
 - [ ] **31.** Resolver as discordâncias com a revisão de um terceiro avaliador.
 - [ ] **32.** Registrar, para cada exemplo, a resposta de referência, a justificativa e a versão da taxonomia.
   - ↳ Reportar também a concordância entre anotadores.
@@ -99,27 +110,29 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 ## F4 — Contrato JEV e adaptadores
 
-- [ ] **36.** Criar um formato canônico de entrada com `id`, `state`, `question`, `options`, `gold_label` e metadados.
+- [x] **36.** Criar um formato canônico de entrada com `id`, `state`, `question`, `options`, `gold_label` e metadados.
   - ↳ Ver [02 §3](02-desenho-experimental.md#3-formato-canônico-de-entrada-tarefa-36), que inclui a **regra única de serialização** de `state`.
-- [ ] **37.** Definir a versão do contrato JEV compatível a usar no benchmark: `POST /v1/systemone`, esquema de requisição, esquema de resposta e códigos de erro. *(Q1)*
+- [x] **37.** Definir a versão do contrato JEV compatível a usar no benchmark: `POST /v1/systemone`, esquema de requisição, esquema de resposta e códigos de erro. *(Q1)*
   - ↳ Versão `jev-compat-v1`. Os esquemas já estão em `contracts/jev/schemas/`; falta revisar os códigos de erro no código dos adaptadores.
-- [ ] **38.** Definir o mapeamento obrigatório entre o contrato JEV e os tipos internos `choice`, `noul` e `score`.
-- [ ] **39.** Definir a regra de conversão de probabilidades, confiança, níveis ordinais, opções descritas e campos de uso.
-- [ ] **40.** Definir o comportamento padronizado para entradas inválidas, limite de contexto, timeout, opção desconhecida e indisponibilidade do modelo.
+- [x] **38.** Definir o mapeamento obrigatório entre o contrato JEV e os tipos internos `choice`, `noul` e `score`.
+- [x] **39.** Definir a regra de conversão de probabilidades, confiança, níveis ordinais, opções descritas e campos de uso.
+- [x] **40.** Definir o comportamento padronizado para entradas inválidas, limite de contexto, timeout, opção desconhecida e indisponibilidade do modelo.
   - ↳ Na prática, uma falha do modelo de decisão vira desambiguação ou fallback no orquestrador. No benchmark, essas falhas contam como erro e são reportadas à parte.
-- [ ] **41.** Criar testes de conformidade com requisições e respostas JEV congeladas.
-- [ ] **42.** Criar um adaptador JEV local para o Laya com o checkpoint multilíngue fixado.
-- [ ] **43.** Criar um adaptador JEV local para o SemIf em modo `direct`, com a revisão do Qwen fixada.
-- [ ] **44.** Criar um adaptador JEV local para o GLiNER Decide usando `classify_text`.
-- [ ] **45.** Criar um adaptador JEV local para o Rizzo Flow usando sua interface de decisões. *(Q4)*
-- [ ] **46.** Expor cada adaptador no mesmo caminho local `POST /v1/systemone`, sem dependência de rede externa.
-- [ ] **47.** Garantir que cada adaptador devolva a resposta JEV completa, incluindo escolha, distribuição de probabilidades, confiança e metadados de uso, quando disponíveis.
-- [ ] **48.** Normalizar as saídas adicionais de execução num registro interno com `latency_ms`, `model_id`, `run_id` e versão do adaptador.
+- [x] **41.** Criar testes de conformidade com requisições e respostas JEV congeladas.
+  - ↳ `contracts/jev/fixtures/conformance.json` + `tests/` (35 testes).
+- [x] **42.** Criar um adaptador JEV local para o Laya com o checkpoint multilíngue fixado.
+- [x] **43.** Criar um adaptador JEV local para o SemIf em modo `direct`, com a revisão do Qwen fixada.
+- [x] **44.** Criar um adaptador JEV local para o GLiNER Decide usando `classify_text`.
+- [x] **45.** Criar um adaptador JEV local para o Rizzo Flow usando sua interface de decisões. *(Q4)*
+- [x] **46.** Expor cada adaptador no mesmo caminho local `POST /v1/systemone`, sem dependência de rede externa.
+- [x] **47.** Garantir que cada adaptador devolva a resposta JEV completa, incluindo escolha, distribuição de probabilidades, confiança e metadados de uso, quando disponíveis.
+- [x] **48.** Normalizar as saídas adicionais de execução num registro interno com `latency_ms`, `model_id`, `run_id` e versão do adaptador.
   - ↳ O registro é emitido como span OpenTelemetry e também gravado em arquivo de resultados.
-- [ ] **49.** Validar que os adaptadores preservam a mesma ordem e a mesma descrição das opções.
-- [ ] **50.** Validar que trocar de candidato não altera a requisição JEV nem o formato da resposta JEV.
-- [ ] **51.** Implementar testes de sanidade com decisões triviais, opções permutadas e os três tipos de pergunta.
+- [x] **49.** Validar que os adaptadores preservam a mesma ordem e a mesma descrição das opções.
+- [x] **50.** Validar que trocar de candidato não altera a requisição JEV nem o formato da resposta JEV.
+- [x] **51.** Implementar testes de sanidade com decisões triviais, opções permutadas e os três tipos de pergunta.
   - ↳ Incluir um teste de invariância à permutação das opções em D1 e D2 (a mesma escolha com outra ordem).
+  - ↳ `harness/sanity.py`. Primeira rodada em CPU (2026-10-07): sem violações de contrato nos 4 candidatos. Acertos: SemIf 8/8, Laya 7/8, Rizzo 7/8, GLiNER 5/8. Invariância à permutação: 4/4 em todos. Os próximos testes rodam na OCI.
 
 ## F5 — Controle de execução
 
@@ -132,6 +145,7 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 - [ ] **55.** Executar um piloto de 50 exemplos por candidato em CPU. *(Q11)*
 - [ ] **56.** Executar um piloto de 50 exemplos por candidato em GPU.
+  - ↳ GPU em **sa-saopaulo-1, A10.1**, uma por vez *(Q14)*. Sanidade em GPU já em andamento.
 - [ ] **57.** Medir memória de GPU, memória RAM, tempo de carga, tempo de aquecimento e falhas do piloto.
 - [ ] **58.** Ajustar apenas os parâmetros operacionais necessários para eliminar falhas de execução.
 

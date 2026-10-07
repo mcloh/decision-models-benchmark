@@ -7,7 +7,7 @@ Todas as questões foram resolvidas em 2026-10-07. O critério foi preferir a **
 | # | Questão | Decisão | Mecanismo automatizado |
 |---|---------|---------|------------------------|
 | Q1 | Contrato JEV | Esquema público do `POST /v1/systemone` (`state` + `questions` tipadas → `answers` + `usage`), congelado como `jev-compat-v1` | JSON Schema em `contracts/jev/schemas/` e testes de conformidade |
-| Q2 | 20 opções incluem o fallback? | Sim: no máximo 19 opções de domínio + `sem_correspondencia` | Validação de esquema (`maxProperties: 20`) e lint do dataset |
+| Q2 | 20 opções incluem o fallback? | Sim, e o limite comum cai para **16**: até 15 opções de domínio + `sem_correspondencia` (revisado: o SemIf aceita só 16) | Validação de esquema (`maxProperties: 16`) e lint do dataset |
 | Q3 | NAT × isolamento | Desassociar a rota NAT logo após a tarefa 16 | Gate de egresso: o pipeline só segue se a sonda de saída **falhar** |
 | Q4 | Interfaces e licenças | Interfaces mapeadas por candidato (abaixo). Só licenças da allowlist | O script de aquisição lê a licença nos metadados do Hub e falha fora da allowlist |
 | Q5 | Critérios de sucesso | SLO de latência fixo + não inferioridade relativa ao baseline | Avaliação automática dos critérios em `config/benchmark.yaml` |
@@ -18,9 +18,24 @@ Todas as questões foram resolvidas em 2026-10-07. O critério foi preferir a **
 | Q10 | Calibração | Temperature scaling por candidato × tarefa, só na partição de calibração | Ajuste por NLL e congelamento com hash |
 | Q11 | Piloto em CPU | Mantido, com timeout. Inviabilidade declarada automaticamente | Regra p95 > timeout → "inviável em CPU" |
 | Q12 | Tamanho do teste | ≥ 1.300 decisões D1 no teste final (análise de poder) | `analysis/sample_size.py`, com recálculo do MDE |
+| Q14 | GPU | A10.1 em **sa-saopaulo-1**, um job por vez (limite da região). Sem VCN disponível lá: rede gerenciada + isolamento no processo (`DMB_ISOLATION=app`) | `infra/ds/gpu_queue.py`, `infra/oci/replicate.py`, autoteste `dmb.offline.self_test` |
+| Q15 | Dados e anotação | 100% sintéticos; anotação por três modelos generativos em rodízio | `datagen/` (ver [02 §4](02-desenho-experimental.md#4-dados)) |
 | Q13 | Centro de custo e orçamento | **Orçamento em aberto**: o uso está coberto por cota interna de engenharia. A estimativa de custo continua no relatório | A estimativa é calculada por script (tarefa 70) |
 
 ---
+
+## Q14 — GPU em São Paulo (revisão de 2026-10-07)
+
+- Em us-chicago-1 não há capacidade de A10, e A100 e V100 têm limite zero. Os jobs de GPU rodam em **sa-saopaulo-1, `VM.GPU.A10.1`**, com limite de **uma GPU por vez** (fila em `infra/ds/gpu_queue.py`).
+- Pesos e ambientes são replicados do lado do servidor para `dmb-artefatos-gru` (`infra/oci/replicate.py`); os resultados vão para `dmb-resultados-gru`.
+- O limite de VCNs da região está esgotado. Os jobs de GPU usam **rede gerenciada**, e o isolamento passa a valer no processo: variáveis offline, bloqueio de sockets fora do loopback e um **autoteste a cada execução** (`process_guard`). O gate de egresso registra que há saída de rede, mas não aborta (`DMB_ISOLATION=app`). É um desvio documentado em relação à tarefa 17. Se uma VCN for liberada em São Paulo, os jobs voltam para uma sub-rede privada.
+- Todas as medições de GPU usam o mesmo shape e a mesma região. As de CPU continuam em us-chicago-1.
+
+## Q15 — Dados sintéticos e anotação por LLMs (revisão de 2026-10-07)
+
+- Substitui Q7: os dados são 100% sintéticos, incluindo fora de escopo e enunciados emocionais. Não há dados reais neste ciclo.
+- A anotação humana (tarefas 30–31) é substituída por três modelos generativos de fornecedores distintos, em rodízio de papéis. O gerador nunca é um dos anotadores.
+- Limitação para o relatório: os rótulos de referência refletem o consenso de LLMs, não de pessoas. A concordância entre anotadores (kappa por par) e com o rótulo de geração é reportada.
 
 ## Q1 — Contrato JEV `jev-compat-v1`
 
@@ -76,7 +91,7 @@ Base: a forma pública do `POST /v1/systemone`, a mesma reproduzida pelas implem
 
 ## Q2 — Limite de opções
 
-O limite de 20 opções inclui `sem_correspondencia`: no máximo 19 opções de domínio + 1. O dataset é validado por esquema. Um exemplo com mais de 20 opções reprova o lint e impede o congelamento (tarefa 35).
+O limite inclui `sem_correspondencia`. **Revisão (2026-10-07):** o código do SemIf (`semif_phase1.core.LETTERS = "A…P"`) aceita no máximo 16 opções. O Laya recomenda até ~20 e o Rizzo aceita 26. O limite comum passa a ser **16: até 15 opções de domínio + 1**. O dataset é validado por esquema. Um exemplo com mais de 16 opções reprova o lint e impede o congelamento (tarefa 35).
 
 ## Q3 — NAT e isolamento de rede
 
