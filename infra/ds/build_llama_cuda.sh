@@ -28,7 +28,12 @@ cmake -S /tmp/llama.cpp -B /tmp/build -G Ninja -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_SHARED_LINKER_FLAGS="-static-libstdc++ -static-libgcc" \
   -DCMAKE_BUILD_RPATH_USE_ORIGIN=ON -DCMAKE_INSTALL_RPATH='$ORIGIN' -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
   >/tmp/cmake.log
-cmake --build /tmp/build -j "$(nproc)" >/tmp/build.log 2>&1 || { tail -50 /tmp/build.log; exit 1; }
+# -k 0: alvos acessórios (apps) podem falhar; só as bibliotecas importam e são conferidas abaixo.
+cmake --build /tmp/build -j "$(nproc)" -- -k 0 >/tmp/build.log 2>&1 || grep -E "^FAILED" /tmp/build.log || true
+for lib in libllama.so libggml.so libggml-base.so libggml-cuda.so; do
+  [ -f "/tmp/build/bin/$lib" ] || { echo "faltou $lib"; tail -40 /tmp/build.log; exit 1; }
+done
+ls /tmp/build/bin/libggml-cpu*.so >/dev/null || { echo "faltou backend de CPU"; exit 1; }
 
 rm -rf "$OUT" && mkdir -p "$OUT"
 find /tmp/build/bin -maxdepth 1 -name "*.so" -exec cp -L {} "$OUT/" \;
