@@ -20,14 +20,14 @@ flowchart LR
 As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 
 <!-- PROGRESSO:INICIO -->
-**Andamento em 2026-10-07:** 40 de 78 tarefas concluídas (51%), 8 em andamento.
+**Andamento em 2026-10-07:** 47 de 78 tarefas concluídas (60%), 2 em andamento.
 
 | Fase | Concluídas | Em andamento | Pendentes |
 |------|-----------|--------------|-----------|
 | F0 — Infraestrutura OCI | 6 | 2 | 2 |
 | F1 — Ambiente e artefatos | 9 | 0 | 0 |
 | F2 — Tarefas de decisão e taxonomia | 4 | 0 | 0 |
-| F3 — Dados e anotação | 5 | 6 | 1 |
+| F3 — Dados e anotação | 12 | 0 | 0 |
 | F4 — Contrato JEV e adaptadores | 16 | 0 | 0 |
 | F5 — Controle de execução | 0 | 0 | 3 |
 | F6 — Piloto | 0 | 0 | 4 |
@@ -35,7 +35,7 @@ As fases F0–F1 (infra) e F2–F3 (dados) podem andar em paralelo.
 | F8 — Teste final | 0 | 0 | 4 |
 | F9 — Métricas e análise | 0 | 0 | 8 |
 | F10 — Relatório e encerramento | 0 | 0 | 4 |
-| **Total** | **40** | **8** | **30** |
+| **Total** | **47** | **2** | **29** |
 
 Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 <!-- PROGRESSO:FIM -->
@@ -111,7 +111,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
   - ↳ **100% sintéticos** (`datagen.generate`, na VM): 4.068 enunciados em 339 lotes (42 intenções × 7 perfis + 5 categorias fora de escopo × 9 lotes), geradores `llama-4-maverick` e `command-a` alternados.
   - ↳ A unidade é a **conversa com vários turnos**, não o enunciado isolado. Cada turno guarda o estado (agente ativo e sessões suspensas).
 - [x] **25.** Remover ou mascarar dados pessoais, segredos e identificadores que o benchmark não precisa.
-- [~] **26.** Separar os textos por domínio, comprimento, grau de ambiguidade e classe esperada.
+- [x] **26.** Separar os textos por domínio, comprimento, grau de ambiguidade e classe esperada.
   - ↳ Acrescentar a posição do turno e a presença de agente ativo ou de sessões suspensas.
   - ↳ Primeiro ciclo (só D1): metadados `domain`, `length_bucket`, `ambiguity`, `profile`, `sentiment`, `kind` e `n_options` gravados por `datagen.build`.
 - [x] **27.** Criar exemplos adversariais com abreviações, erros de ortografia, regionalismos, textos curtos e várias intenções.
@@ -122,16 +122,19 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 - [x] **29.** Produzir o guia de anotação humana.
   - ↳ [06-guia-de-anotacao.md](06-guia-de-anotacao.md), usado literalmente pelos anotadores.
   - ↳ O guia cobre D1–D4 com exemplos-limite (por exemplo, quando um enunciado curto continua a tarefa do agente ativo e quando inicia um novo agente).
-- [~] **30.** Anotar cada exemplo com dois avaliadores independentes.
+- [x] **30.** Anotar cada exemplo com dois avaliadores independentes.
   - ↳ Avaliadores = modelos generativos em rodízio (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`). *(Q15)*
-- [~] **31.** Resolver as discordâncias com a revisão de um terceiro avaliador.
-- [~] **32.** Registrar, para cada exemplo, a resposta de referência, a justificativa e a versão da taxonomia.
+  - ↳ Resultado: 4057 anotados; 3992 consensos (98.4%); kappa por par entre 0.982 e 0.986; concordância com o rótulo de geração 97.9%. Relatório em `reports/datagen/annotation-report.json`.
+- [x] **31.** Resolver as discordâncias com a revisão de um terceiro avaliador.
+- [x] **32.** Registrar, para cada exemplo, a resposta de referência, a justificativa e a versão da taxonomia.
   - ↳ Reportar também a concordância entre anotadores.
-- [~] **33.** Separar os dados em desenvolvimento, calibração e teste final por grupo de origem. *(Q12)*
-  - ↳ O grupo é `group_id`, ou seja, a conversa.
-- [~] **34.** Impedir que textos derivados do mesmo caso apareçam em mais de uma partição.
-- [ ] **35.** Congelar o conjunto de teste final antes de qualquer ajuste de parâmetros.
+- [x] **33.** Separar os dados em desenvolvimento, calibração e teste final por grupo de origem. *(Q12)*
+  - ↳ O grupo é `group_id`, ou seja, a conversa. No ciclo sintético, o grupo é o lote de geração.
+  - ↳ `data/splits/` (d1-v1): dev 1183 · calibração 1127 · teste 1744 exemplos (teste ≥ 1.300, Q12).
+- [x] **34.** Impedir que textos derivados do mesmo caso apareçam em mais de uma partição.
+- [x] **35.** Congelar o conjunto de teste final antes de qualquer ajuste de parâmetros.
   - ↳ Registrar o hash do arquivo congelado e guardar uma cópia em `logs-imutaveis`.
+  - ↳ Congelado em 2026-10-07: SHA-256 em `data/splits/MANIFEST.json`, cópias em `dmb-entrada` e `dmb-logs-imutaveis` (`splits/d1-v1/`), junto com os dados brutos da geração e da anotação.
 
 ## F4 — Contrato JEV e adaptadores
 
@@ -171,7 +174,7 @@ Legenda: `[x]` concluída · `[~]` em andamento ou parcial · `[ ]` pendente.
 - [ ] **55.** Executar um piloto de 50 exemplos por candidato em CPU.
   - ↳ Sanidade em CPU (us-chicago-1, sub-rede privada) aprovada nos 4 candidatos: Laya 125 ms, GLiNER 194 ms, Rizzo Flow 7,3 s, SemIf 16,4 s (latência mediana). *(Q11)*
 - [ ] **56.** Executar um piloto de 50 exemplos por candidato em GPU.
-  - ↳ GPU em **sa-saopaulo-1, A10.1**, uma por vez *(Q14)*. Sanidade em GPU: Laya 21 ms, GLiNER 16 ms, SemIf 66 ms (latência mediana). Rizzo Flow exigiu compilar o llama.cpp com CUDA para a glibc da imagem dos jobs (`infra/ds/build_llama_cuda.sh`).
+  - ↳ GPU em **sa-saopaulo-1, A10.1**, uma por vez *(Q14)*. Sanidade em GPU: Laya 21 ms, GLiNER 16 ms, SemIf 66 ms (latência mediana). Rizzo Flow 62 ms, depois de compilar o llama.cpp com CUDA para a glibc da imagem dos jobs (`infra/ds/build_llama_cuda.sh`).
 - [ ] **57.** Medir memória de GPU, memória RAM, tempo de carga, tempo de aquecimento e falhas do piloto.
 - [ ] **58.** Ajustar apenas os parâmetros operacionais necessários para eliminar falhas de execução.
 

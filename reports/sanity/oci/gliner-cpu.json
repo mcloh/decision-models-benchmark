@@ -1,0 +1,222 @@
+{
+  "candidate": {
+    "name": "gliner",
+    "model_id": "gliner@a35a0cd3b7a0",
+    "revision": "a35a0cd3b7a0f00f2effc576f454cd48fa98aa5f",
+    "adapter_version": "0.1.0",
+    "device": "cpu",
+    "context_limit": 4096,
+    "probabilities_source": "native"
+  },
+  "device": "cpu",
+  "load_seconds": 19.49,
+  "conformance": [
+    {
+      "name": "valid_choice_noul",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "valid_score",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "valid_state_object",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "invalid_17_options",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_single_option",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_noul_missing_false",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_unknown_type",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_empty_state",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_no_questions",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_extra_field",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    }
+  ],
+  "sanity": [
+    {
+      "name": "choice:pagamento",
+      "gold": "pagamento",
+      "pred": "pagamento",
+      "latency_ms": 207.2,
+      "answer": {
+        "type": "choice",
+        "choice": "pagamento",
+        "confidence": 0.6344144486132514,
+        "probabilities": {
+          "pagamento": 0.6344144486132514,
+          "cancelamento": 0.016834581647096163,
+          "suporte_tecnico": 0.022163255635572723,
+          "sem_correspondencia": 0.3265877141040798
+        }
+      },
+      "pred_permuted": "pagamento",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "choice:cancelamento",
+      "gold": "cancelamento",
+      "pred": "cancelamento",
+      "latency_ms": 206.5,
+      "answer": {
+        "type": "choice",
+        "choice": "cancelamento",
+        "confidence": 0.8718590947504495,
+        "probabilities": {
+          "pagamento": 0.010419044895931304,
+          "cancelamento": 0.8718590947504495,
+          "suporte_tecnico": 0.012619423054256475,
+          "sem_correspondencia": 0.10510243729936272
+        }
+      },
+      "pred_permuted": "cancelamento",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "choice:suporte_tecnico",
+      "gold": "suporte_tecnico",
+      "pred": "sem_correspondencia",
+      "latency_ms": 204.3,
+      "answer": {
+        "type": "choice",
+        "choice": "sem_correspondencia",
+        "confidence": 0.634299124256301,
+        "probabilities": {
+          "pagamento": 0.02020097044151347,
+          "cancelamento": 0.04278694633119902,
+          "suporte_tecnico": 0.30271295897098655,
+          "sem_correspondencia": 0.634299124256301
+        }
+      },
+      "pred_permuted": "sem_correspondencia",
+      "permutation_invariant": true,
+      "correct": false
+    },
+    {
+      "name": "choice:sem_correspondencia",
+      "gold": "sem_correspondencia",
+      "pred": "sem_correspondencia",
+      "latency_ms": 194.3,
+      "answer": {
+        "type": "choice",
+        "choice": "sem_correspondencia",
+        "confidence": 0.8604282044571466,
+        "probabilities": {
+          "pagamento": 0.02875952763006619,
+          "cancelamento": 0.0316480618158572,
+          "suporte_tecnico": 0.07916420609692999,
+          "sem_correspondencia": 0.8604282044571466
+        }
+      },
+      "pred_permuted": "sem_correspondencia",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "noul:clara",
+      "gold": "true",
+      "pred": "false",
+      "latency_ms": 173.0,
+      "answer": {
+        "type": "noul",
+        "noul": 0.2368284577603868
+      },
+      "correct": false
+    },
+    {
+      "name": "noul:vaga",
+      "gold": "false",
+      "pred": "false",
+      "latency_ms": 166.4,
+      "answer": {
+        "type": "noul",
+        "noul": 0.20341389158881357
+      },
+      "correct": true
+    },
+    {
+      "name": "score:alta",
+      "gold": "2",
+      "pred": "0",
+      "latency_ms": 163.5,
+      "answer": {
+        "type": "score",
+        "score": 0.9812680775305056,
+        "confidence": 0.3614072907390383,
+        "probabilities": {
+          "0": 0.3614072907390383,
+          "1": 0.2959173409914178,
+          "2": 0.34267536826954387
+        },
+        "legend": {
+          "0": "Baixa",
+          "1": "Média",
+          "2": "Alta"
+        }
+      },
+      "correct": false
+    },
+    {
+      "name": "score:baixa",
+      "gold": "0",
+      "pred": "0",
+      "latency_ms": 155.1,
+      "answer": {
+        "type": "score",
+        "score": 0.4816716677697748,
+        "confidence": 0.6750852767416213,
+        "probabilities": {
+          "0": 0.6750852767416213,
+          "1": 0.16815777874698246,
+          "2": 0.15675694451139618
+        },
+        "legend": {
+          "0": "Baixa",
+          "1": "Média",
+          "2": "Alta"
+        }
+      },
+      "correct": true
+    }
+  ],
+  "summary": {
+    "contract_violations": [],
+    "sanity_correct": "5/8",
+    "permutation_invariant": "4/4"
+  },
+  "oci": {
+    "region": "us-chicago-1",
+    "run_id": "20261007T153410Z-gliner-sanity"
+  }
+}

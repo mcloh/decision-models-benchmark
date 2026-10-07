@@ -1,0 +1,223 @@
+{
+  "candidate": {
+    "name": "rizzo_flow",
+    "model_id": "rizzo_flow@55633c8cbd2b",
+    "revision": "55633c8cbd2b826bd3eefdeb05310450996649df",
+    "adapter_version": "0.1.0",
+    "device": "cuda",
+    "context_limit": 2048,
+    "probabilities_source": "native"
+  },
+  "device": "cuda",
+  "load_seconds": 5.3,
+  "process_guard": "ok",
+  "conformance": [
+    {
+      "name": "valid_choice_noul",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "valid_score",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "valid_state_object",
+      "expected": "ok",
+      "got": "ok"
+    },
+    {
+      "name": "invalid_17_options",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_single_option",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_noul_missing_false",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_unknown_type",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_empty_state",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_no_questions",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    },
+    {
+      "name": "invalid_extra_field",
+      "expected": "invalid_request",
+      "got": "invalid_request"
+    }
+  ],
+  "sanity": [
+    {
+      "name": "choice:pagamento",
+      "gold": "pagamento",
+      "pred": "pagamento",
+      "latency_ms": 62.3,
+      "answer": {
+        "type": "choice",
+        "choice": "pagamento",
+        "confidence": 0.9937313892294425,
+        "probabilities": {
+          "pagamento": 0.9952985419220819,
+          "cancelamento": 0.0014555718031770129,
+          "suporte_tecnico": 0.0007138147545963065,
+          "sem_correspondencia": 0.0025320715201448793
+        }
+      },
+      "pred_permuted": "pagamento",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "choice:cancelamento",
+      "gold": "cancelamento",
+      "pred": "cancelamento",
+      "latency_ms": 66.4,
+      "answer": {
+        "type": "choice",
+        "choice": "cancelamento",
+        "confidence": 0.9958236126678967,
+        "probabilities": {
+          "pagamento": 0.000736589116875824,
+          "cancelamento": 0.9968677095009225,
+          "suporte_tecnico": 0.000579527206419017,
+          "sem_correspondencia": 0.0018161741757827666
+        }
+      },
+      "pred_permuted": "cancelamento",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "choice:suporte_tecnico",
+      "gold": "suporte_tecnico",
+      "pred": "suporte_tecnico",
+      "latency_ms": 64.4,
+      "answer": {
+        "type": "choice",
+        "choice": "suporte_tecnico",
+        "confidence": 0.9535000077378192,
+        "probabilities": {
+          "pagamento": 0.001133195848223361,
+          "cancelamento": 0.0021639955558770034,
+          "suporte_tecnico": 0.9651250058033644,
+          "sem_correspondencia": 0.031577802792535394
+        }
+      },
+      "pred_permuted": "suporte_tecnico",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "choice:sem_correspondencia",
+      "gold": "sem_correspondencia",
+      "pred": "sem_correspondencia",
+      "latency_ms": 66.7,
+      "answer": {
+        "type": "choice",
+        "choice": "sem_correspondencia",
+        "confidence": 0.9874519299503838,
+        "probabilities": {
+          "pagamento": 0.004033476792992324,
+          "cancelamento": 0.0025021007457173418,
+          "suporte_tecnico": 0.0028754749985024732,
+          "sem_correspondencia": 0.9905889474627878
+        }
+      },
+      "pred_permuted": "sem_correspondencia",
+      "permutation_invariant": true,
+      "correct": true
+    },
+    {
+      "name": "noul:clara",
+      "gold": "true",
+      "pred": "true",
+      "latency_ms": 61.8,
+      "answer": {
+        "type": "noul",
+        "noul": 0.947542960858974
+      },
+      "correct": true
+    },
+    {
+      "name": "noul:vaga",
+      "gold": "false",
+      "pred": "false",
+      "latency_ms": 55.3,
+      "answer": {
+        "type": "noul",
+        "noul": 0.4973615950856545
+      },
+      "correct": true
+    },
+    {
+      "name": "score:alta",
+      "gold": "2",
+      "pred": "2",
+      "latency_ms": 55.9,
+      "answer": {
+        "type": "score",
+        "score": 1.9423142016746011,
+        "confidence": 0.9482293944199722,
+        "probabilities": {
+          "0": 0.023172061272047177,
+          "1": 0.011341675781304721,
+          "2": 0.9654862629466482
+        },
+        "legend": {
+          "0": "Baixa",
+          "1": "Média",
+          "2": "Alta"
+        }
+      },
+      "correct": true
+    },
+    {
+      "name": "score:baixa",
+      "gold": "0",
+      "pred": "0",
+      "latency_ms": 55.1,
+      "answer": {
+        "type": "score",
+        "score": 0.2562808099480609,
+        "confidence": 0.624089907903691,
+        "probabilities": {
+          "0": 0.7493932719357941,
+          "1": 0.244932646180351,
+          "2": 0.005674081883854951
+        },
+        "legend": {
+          "0": "Baixa",
+          "1": "Média",
+          "2": "Alta"
+        }
+      },
+      "correct": true
+    }
+  ],
+  "summary": {
+    "contract_violations": [],
+    "sanity_correct": "8/8",
+    "permutation_invariant": "4/4"
+  },
+  "oci": {
+    "region": "sa-saopaulo-1",
+    "run_id": "20261007T171106Z-rizzo_flow-sanity"
+  }
+}

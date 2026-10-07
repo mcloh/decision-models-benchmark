@@ -1,0 +1,54 @@
+{
+  "version": "d1-v1",
+  "taxonomy_version": "v1.0",
+  "built_at": "2026-10-07T17:13:53+00:00",
+  "source_run": "/data/runs/datagen-v1",
+  "seed": 20261007,
+  "splits": {
+    "dev": {
+      "file": "dev.jsonl",
+      "sha256": "964c58ca34054e7186b8544cbcddf8e89e317cdb51b43dc2ffd05c99ef757465",
+      "examples": 1183,
+      "groups": 99,
+      "labels": 43,
+      "oos": 178,
+      "gold_not_eligible": 98,
+      "n_options": {
+        "4": 320,
+        "8": 311,
+        "12": 274,
+        "16": 278
+      }
+    },
+    "calibration": {
+      "file": "calibration.jsonl",
+      "sha256": "c35d919324d5bbbcb2b9e7369a3554c5cfd77e5a50da3f7a4e6c4b971a03436c",
+      "examples": 1127,
+      "groups": 94,
+      "labels": 43,
+      "oos": 120,
+      "gold_not_eligible": 114,
+      "n_options": {
+        "4": 287,
+        "8": 293,
+        "12": 277,
+        "16": 270
+      }
+    },
+    "test": {
+      "file": "test.jsonl",
+      "sha256": "e3bd18c5ae6a19e996f0a81cece1b2afe1056e7969fa6b4ea962d3a1ca7df00b",
+      "examples": 1744,
+      "groups": 146,
+      "labels": 43,
+      "oos": 236,
+      "gold_not_eligible": 142,
+      "n_options": {
+        "4": 451,
+        "8": 431,
+        "12": 422,
+        "16": 440
+      }
+    }
+  }
+}

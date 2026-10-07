@@ -94,6 +94,8 @@ Cada tarefa tem **pergunta**, **opções com descrição** e **regra de decisão
 | Anotação | `datagen.annotate`: três modelos (`openai.gpt-5.5`, `google.gemini-2.5-pro`, `xai.grok-4.3`) em rodízio por lote; dois anotam de forma independente, sem ver o rótulo de geração, e o terceiro desempata. Três rótulos distintos → exemplo excluído. Instruções: [06-guia-de-anotacao.md](06-guia-de-anotacao.md) | 29–32 |
 | Montagem | `datagen.build`: partição por lote de geração (3/2/2 lotes por intenção para teste/calibração/dev), conjuntos de 4, 8, 12 ou 16 opções simulando a elegibilidade (10% sem a intenção correta → `sem_correspondencia`), lint e congelamento com SHA-256 em `dmb-entrada` e `dmb-logs-imutaveis` | 33–36 |
 
+**Conjunto d1-v1 (congelado em 2026-10-07):** 4.068 gerados → 4.057 após a preparação → 4054 após a anotação (62 por desempate; 3 excluídos). Partições: dev 1183, calibração 1127, teste 1744, com 43 rótulos em todas. Kappa entre anotadores de 0.98 a 0.99: a concordância muito alta sugere que parte dos casos sintéticos é fácil. Para o relatório, os cortes por perfil (erros, regionalismo, emocional, indireto) e por `gold_eligible=false` devem receber atenção.
+
 Itens abaixo descrevem o desenho geral (válido também para dados reais em ciclos futuros).
 
 
