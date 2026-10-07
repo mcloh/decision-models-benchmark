@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "jev-compat-v1/response.schema.json",
+  "title": "JEV systemone response (jev-compat-v1)",
+  "type": "object",
+  "required": ["model", "answers", "usage"],
+  "properties": {
+    "model": {"type": "string", "minLength": 1},
+    "answers": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          {"$ref": "#/$defs/choice"},
+          {"$ref": "#/$defs/noul"},
+          {"$ref": "#/$defs/score"}
+        ]
+      }
+    },
+    "usage": {
+      "type": "object",
+      "required": ["input_tokens", "output_tokens"],
+      "properties": {
+        "input_tokens": {"type": "integer", "minimum": 0},
+        "output_tokens": {"const": 0}
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Extensão do benchmark (tarefa 48); ignorada por clientes JEV.",
+      "properties": {
+        "latency_ms": {"type": "number", "minimum": 0},
+        "model_id": {"type": "string"},
+        "run_id": {"type": "string"},
+        "adapter_version": {"type": "string"},
+        "probabilities_source": {"enum": ["native", "normalized_scores", "logprobs", "none"]},
+        "truncated": {"type": "boolean"}
+      }
+    }
+  },
+  "$defs": {
+    "prob": {"type": "number", "minimum": 0, "maximum": 1},
+    "probs": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/prob"}},
+    "choice": {
+      "type": "object",
+      "required": ["type", "choice", "probabilities"],
+      "properties": {
+        "type": {"const": "choice"},
+        "choice": {"type": "string"},
+        "confidence": {"$ref": "#/$defs/prob"},
+        "probabilities": {"$ref": "#/$defs/probs"}
+      }
+    },
+    "noul": {
+      "type": "object",
+      "required": ["type", "noul"],
+      "properties": {
+        "type": {"const": "noul"},
+        "noul": {"$ref": "#/$defs/prob"}
+      }
+    },
+    "score": {
+      "type": "object",
+      "required": ["type", "score", "probabilities", "legend"],
+      "properties": {
+        "type": {"const": "score"},
+        "score": {"type": "number", "minimum": 0},
+        "confidence": {"$ref": "#/$defs/prob"},
+        "probabilities": {"$ref": "#/$defs/probs"},
+        "legend": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    }
+  }
+}

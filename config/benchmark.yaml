@@ -1,0 +1,101 @@
+# Configuração pré-registrada do benchmark.
+# Decisões e justificativas: docs/04-questoes-em-aberto.md
+# Este arquivo é congelado com hash no marco da tarefa 62.
+
+contract:
+  version: jev-compat-v1                     # Q1
+  endpoint: /v1/systemone
+  max_options: 20                            # Q2: inclui sem_correspondencia
+  fallback_option: sem_correspondencia
+  require_zero_output_tokens: true
+
+candidates:
+  laya:
+    model: convaiinnovations/laya-multilingual
+    revision: null                           # preenchido pela aquisição (tarefa 13)
+    declared_context: 1024
+  semif:
+    model: Qwen/Qwen3.5-4B
+    runtime: SemIf-OpenJev
+    mode: direct
+    revision: null
+    declared_context: 8192
+  gliner:
+    model: fastino/GLiNER2.5-multi-Decide
+    interface: classify_text
+    revision: null
+    declared_context: null                   # medido (Q4)
+  rizzo_flow:
+    model: rizzoaiacademy/rizzo-flow
+    prompt_version: spark-decisions-v3
+    revision: null
+    declared_context: 2048
+
+baseline:                                    # Q9: fora do ranking principal
+  enabled: true
+  model: null                                # fixado no manifesto
+  network: gateway_only
+
+licenses:                                    # Q4
+  allowlist: [apache-2.0, mit]
+
+network:                                     # Q3
+  egress_probe_hosts: [huggingface.co, pypi.org]
+  require_probe_failure: true
+
+input:                                       # Q8
+  state_turns_candidates: [0, 1, 2, 4]
+  fit_ratio_min: 0.95
+  token_counter: most_verbose_tokenizer
+  truncation: drop_oldest_turns_then_tail_truncate_utterance
+
+execution:
+  seed: 20261007
+  batch_sweep: [1, 2, 4, 8, 16, 32]          # Q6
+  production_batch: auto                     # maior lote com p95 <= slo
+  repetitions: 3
+  cpu:                                       # Q11
+    timeout_ms: 10000
+    max_timeout_rate: 0.05
+  gpu:
+    timeout_ms: 2000
+  unavailable_retries: 3
+
+calibration:                                 # Q10
+  method: temperature_scaling
+  per: [candidate, task]
+  cv_folds: 5
+  accept_if: ece_decreases
+
+criteria:                                    # Q5
+  latency_gpu_batch1:
+    p95_ms_per_decision: 150
+    p95_ms_per_turn: 300
+  accuracy:
+    tasks: [D1, D2]
+    non_inferiority_margin_pp: 3.0
+    ci: 0.95
+    bootstrap_unit: group_id
+    fallback_macro_f1_min: 0.80
+  risk:
+    max_confident_wrong_route_rate: 0.02
+    min_coverage: 0.80
+
+sample_size:                                 # Q12
+  task: D1
+  mde_pp: 3.0
+  alpha: 0.05
+  power: 0.80
+  expected_discordance: 0.15
+  prior_icc: 0.05
+  min_test_decisions: 1300
+
+data:                                        # Q7
+  sources: [real, synthetic]
+  human_audit_rate: 0.05
+  dedup: minhash_lsh
+
+budget:                                      # Q13: em aberto (cota interna); não provisionado
+  enabled: false
+  contingency_factor: 1.3
+  alerts_pct: [50, 80, 100]

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+# Pesos e caches de modelos (ficam no bucket `artefatos`)
+models/
+.cache/
+*.safetensors
+*.bin
+*.gguf
+
+# Dados brutos e anotados não são versionados (ficam nos buckets OCI)
+data/raw/*
+data/annotated/*
+!data/**/.gitkeep
+
+# Resultados de execução (ficam no bucket `resultados`)
+runs/
+*.log
+
+# Credenciais
+.secrets/
+.oci/
+*.pem
+.env
