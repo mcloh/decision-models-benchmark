@@ -70,6 +70,74 @@ Encoders compactos não servem como roteador principal neste domínio.
 
 Detalhes em [docs/02 — desenho experimental](docs/02-desenho-experimental.md) e [docs/04 — decisões de projeto](docs/04-decisoes-de-projeto.md).
 
+### Esclarecimento Metodológico
+
+**O problema dos modelos de decisão:**   
+
+- **Score alto com acurácia baixa** (modelo confiante demais): ele erra achando que acertou. É o erro perigoso.
+- **Score baixo com acurácia alta** (modelo inseguro demais): ele acerta, mas não confia, e o sistema pede desambiguação sem necessidade.
+
+**Etapa 1 — Calibração: deixar o score honesto**
+
+Calibrar é ajustar o score para que **ele signifique o que diz**. Quando o modelo calibrado diz "90%", ele acerta cerca de 90% dessas vezes. Nessa etapa ainda não existe decisão nem risco.
+
+- **Como foi feito:** com o histórico da partição de calibração (1.127 exemplos de acurácia conhecida), compara-se o score que cada modelo deu com o acerto real. Daí sai um único número de correção por modelo, a "temperatura":
+  - **T > 1 achata o score** e corrige o excesso de confiança. Laya (T = 3,6): dizia ~95% de certeza e acertava ~55%.
+  - **T < 1 estica o score** e corrige a falta de confiança. GLiNER (T = 0,8).
+  - **T ≈ 1 quase não mexe.** SemIf e Rizzo (1,25 a 1,28), que já eram razoavelmente honestos.
+- **Como se mede:** pelo ECE, a distância média entre a certeza que o modelo declara e o acerto real. No Laya, foi de 0,33 para 0,08.
+- **O que não muda:** a calibração não troca a resposta do modelo, só o score. A ordem das opções é preservada, e por isso a acurácia é a mesma antes e depois.
+
+**Etapa 2 — Limiar: aqui entra o fator de risco**
+
+Com o score já honesto, escolhe-se a **régua**: acima dela o modelo decide sozinho, abaixo dela pede desambiguação. Esse é o cálculo de risco que você descreveu. Ele também usa a partição de calibração:
+- para cada régua possível, conta-se quantos casos o modelo decidiria sozinho (cobertura) e quantos desses seriam erros com score alto (risco);
+- escolhe-se a régua mais baixa que mantém o risco em até 2% do total.
+
+**Por que a ordem importa**
+
+Sem a etapa 1, a régua da etapa 2 não seria confiável. Num modelo confiante demais, a régua de 0,9 deixaria passar muito mais erros do que o esperado. A calibração faz com que "0,9" valha o mesmo em qualquer modelo e em qualquer dia, e só então a régua de risco funciona como previsto.
+
+**Em uma frase:** a calibração alinha score e acurácia; o limiar transforma esse score confiável numa decisão com risco controlado. Os dois foram ajustados só com a partição de calibração e congelados antes do teste final, que confirmou o resultado: o risco ficou entre 1,4% e 1,9% para todos os candidatos.   
+
+Portanto, **o modelo só decide sozinho quando está muito seguro, e esse "muito seguro" foi ajustado para que no máximo 2 em cada 100 mensagens acabem num erro que ninguém percebe.** Não é "incerteza abaixo de 2%". O 2% é o limite de **erros que passam batido**.
+
+**A analogia: um atendente novato com um supervisor ao lado.**
+
+A cada mensagem do cliente, o atendente pensa "acho que é sobre a fatura" e diz o quanto tem certeza, de 0% a 100%.
+
+- **Se a certeza é alta** (acima de uma régua, por exemplo 91%), ele encaminha sozinho.
+- **Se é baixa**, chama o supervisor, ou seja, o sistema pergunta ao cliente "você quer falar da fatura ou do plano?".
+
+A pergunta do benchmark é: **onde colocar essa régua?**
+- **Régua baixa:** o atendente resolve quase tudo sozinho, mas erra mais sem avisar ninguém.
+- **Régua alta:** ele quase não erra, mas chama o supervisor o tempo todo.
+
+**Como a régua foi escolhida**
+
+Primeiro foi fixada a regra: **dentre todas as mensagens, no máximo 2% podem ser encaminhadas para o lugar errado com o modelo dizendo que tinha certeza.** Esse é o erro perigoso, porque o cliente cai no agente errado e ninguém percebe. Com essa regra fixa, a régua desce até o ponto mais baixo que ainda a respeita. Quanto mais baixa a régua, mais o modelo resolve sozinho.
+
+Um detalhe importante: antes disso, os modelos foram **calibrados**. Um modelo que diz "90% de certeza" tem de acertar de fato cerca de 90% dessas vezes. Sem calibrar, alguns diziam 95% e acertavam bem menos (o Laya era o pior caso).
+
+**O que deu, a cada 100 mensagens**
+
+| Modelo | Resolve sozinho | Desses, acerta | Erros com "certeza" (o perigoso) | Pergunta de volta ao cliente |
+|---|---|---|---|---|
+| SemIf | 62 | ~60 (97%) | ~1,6 | 38 |
+| Rizzo Flow | 47 | ~45 (97%) | ~1,5 | 53 |
+| GLiNER | 13 | ~11 (85%) | ~1,9 | 87 |
+| Laya | 10 | ~9 (87%) | ~1,4 | 90 |
+
+**Como ler isso:**
+- **SemIf:** de cada 100 mensagens, encaminha 62 sozinho e quase sempre acerta. As outras 38 viram uma pergunta de esclarecimento ao cliente. É o melhor equilíbrio.
+- **Laya e GLiNER:** respeitam o limite de 2%, mas só porque quase nunca decidem sozinhos. Perguntariam de volta em ~90% das conversas, o que, na prática, torna o modelo inútil como roteador.
+
+**Por que "nenhum atingiu a meta"**
+
+A meta pré-registrada era resolver sozinho **pelo menos 80** de cada 100 mensagens, mantendo o erro perigoso em até 2. O melhor chegou a 62. Para o SemIf resolver 80 sozinho, o erro perigoso subiria para ~6 em cada 100.
+
+**Em uma frase:** o SemIf consegue decidir sozinho em 6 de cada 10 conversas, com 97% de acerto. Nas outras 4, o orquestrador deve perguntar ao cliente antes de agir.   
+
 ## Detalhes do projeto
 
 ### Plano de tarefas
