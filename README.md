@@ -97,7 +97,8 @@ As 78 microtarefas, organizadas em 11 fases e com o andamento de cada uma, estã
 | Partições congeladas | [data/splits/](data/splits/) ([MANIFEST.json](data/splits/MANIFEST.json)) |
 | Contrato e fixtures de conformidade | [contracts/jev/](contracts/jev/) |
 | Predições, resumos de execução e análise | [reports/](reports/) |
-| Logs de cada execução (stdout, stderr, `run.json` com gate de rede e ambiente) | Buckets `dmb-resultados` e `dmb-resultados-gru`, `runs/<run_id>/` |
+| Logs de cada execução (stdout, stderr, `run.json`) e dados brutos da geração e anotação | Cópia local fora do Git (`runs/`, `data/raw/`) |
+| Recriação do ambiente na OCI | `infra/oci/provision.py` → `env/acquire.py` → `infra/ds/build_env.sh`; remoção com `infra/oci/teardown.py` |
 
 ```bash
 # testes locais do contrato, formato, servidor, isolamento, métricas, congelamento e dados sensíveis

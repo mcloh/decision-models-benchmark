@@ -72,6 +72,10 @@ PYTHONPATH=infra/oci .venv/bin/python infra/ds/collect.py --split dev --dest rep
 infra/vm/remote.sh run 'python -m datagen.generate --out /data/runs/datagen-v1'   # depois prepare, annotate, build
 ```
 
+## Ciclo de vida dos recursos
+
+Os recursos da OCI existem só durante o ciclo de medição. `infra/oci/provision.py` cria o compartment, as políticas, a rede, os buckets e o projeto do Data Science; `env/acquire.py` e `infra/ds/build_env.sh` publicam artefatos e ambientes; `infra/oci/teardown.py` remove tudo ao final. O ciclo `d1-v1` foi encerrado com o deprovisionamento completo: o registro permanente está neste repositório, e os dados brutos e os logs de execução ficam numa cópia local fora do Git (`data/raw/`, `runs/`).
+
 ## Configuração local sensível
 
 Ficam fora do Git, em `.secrets/`: credenciais OCI e do GitHub, chaves SSH, o catálogo de recursos com OCIDs e `oci-settings.json` (compartimento pai e CIDR autorizado para SSH). O teste `tests/test_sensitive.py` falha se OCIDs, chaves, IPs públicos ou valores de `.secrets/` aparecerem em arquivos versionados.
